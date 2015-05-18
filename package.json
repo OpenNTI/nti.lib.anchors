@@ -1,5 +1,5 @@
 {
-	"name": "nti.lib.anchors",
+	"name": "nti.lib.anchorjs",
 	"version": "0.0.1",
 	"description": "Content Anchor handling library",
 
@@ -14,10 +14,12 @@
 	},
 	"author": "",
 	"license": "private",
+
 	"dependencies": {
 		"nti.lib.dom": "git+https://repos.nextthought.com/git/nti.lib.domjs",
 		"nti.lib.interfaces": "git+https://repos.nextthought.com/git/nti.lib.interfaces"
 	},
+
 	"devDependencies": {
 		"babel": ">=5.1.0",
 		"babel-eslint": ">=3.0.0",
