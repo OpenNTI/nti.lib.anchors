@@ -1,20 +1,22 @@
 /*globals document, NodeFilter*/
-import isEmpty from '../utils/isempty';
-import isElement from '../utils/dom-iselementnode';
-import isTextNode from '../utils/dom-istextnode';
-import getTextNodes from '../utils/dom-gettextnodes';
-import hasClass from '../utils/dom-hasclass';
-import matchesSelector from '../utils/dom-matches';
-import parentFor from '../utils/dom-parent';
-import removeNode from '../utils/dom-remove';
+import isElement from 'nti.lib.domjs/lib/iselement';
+import isTextNode from 'nti.lib.domjs/lib/istextnode';
 
-import ContentRangeDescription from './ContentRagneDescription';
-import DomContentRangeDescription from './DomContentRagneDescription';
+import getTextNodes from 'nti.lib.domjs/lib/gettextnodes';
+import hasClass from 'nti.lib.domjs/lib/hasclass';
+import matchesSelector from 'nti.lib.domjs/lib/matches';
+import parentFor from 'nti.lib.domjs/lib/parent';
+import removeNode from 'nti.lib.domjs/lib/removenode';
 
-import ElementDomContentPointer from './ElementDomContentPointer';
-import TextDomContentPointer from './TextDomContentPointer';
+import isEmpty from 'nti.lib.interfaces/utils/isempty';
 
-import TextContext from './TextContext';
+import ContentRangeDescription from 'nti.lib.interfaces/models/anchors/ContentRagneDescription';
+import DomContentRangeDescription from 'nti.lib.interfaces/models/anchors/DomContentRagneDescription';
+
+import ElementDomContentPointer from 'nti.lib.interfaces/models/anchors/ElementDomContentPointer';
+import TextDomContentPointer from 'nti.lib.interfaces/models/anchors/TextDomContentPointer';
+
+import TextContext from 'nti.lib.interfaces/models/anchors/TextContext';
 
 const CONTAINER_SELECTORS = [
 	'object[type$=naquestion][data-ntiid]',
@@ -411,7 +413,7 @@ function rootContainerIdFromDocument (doc) {
 export function createRangeDescriptionFromRange (range, docElement) {
 	if (!range) {
 		console.log('Returning empty ContentRangeDescription for null range');
-		return {description: new ContentRangeDescription({})};
+		return {description: new ContentRangeDescription(null, null, {})};
 	}
 
 	cleanRangeFromBadStartAndEndContainers(range);
@@ -440,13 +442,13 @@ export function createRangeDescriptionFromRange (range, docElement) {
 
 	result.container = getContainerNtiid(ancestorNode, docElement);
 
-	ancestorAnchor = new ElementDomContentPointer({
+	ancestorAnchor = new ElementDomContentPointer(null, null, {
 		node: ancestorNode,
 		role: 'ancestor'
 	});
 
 	try {
-		result.description = new DomContentRangeDescription({
+		result.description = new DomContentRangeDescription(null, null, {
 			start: createPointer(pureRange, 'start'),
 			end: createPointer(pureRange, 'end'),
 			ancestor: ancestorAnchor
@@ -580,7 +582,7 @@ function createPointer (range, role, node) {
 	}
 
 	if (isElement(edgeNode)) {
-		return new ElementDomContentPointer({
+		return new ElementDomContentPointer(null, null, {
 			elementTagName: edgeNode.tagName,
 			elementId: edgeNode.getAttribute('data-ntiid') || edgeNode.getAttribute('id'),
 			role: role
@@ -663,7 +665,7 @@ export function createTextPointerFromRange (range, role) {
 		sibling = nextSiblingFunction.call(walker);
 	}
 
-	return new TextDomContentPointer({
+	return new TextDomContentPointer(null, null, {
 		role: role,
 		contexts: contexts,
 		edgeOffset: edgeOffset,
@@ -694,7 +696,7 @@ export function generateAdditionalContext (relativeNode, role) {
 		offset = relativeNode.textContent.length - offset;
 	}
 
-	return new TextContext({
+	return new TextContext(null, null, {
 		contextText: contextText,
 		contextOffset: offset
 	});
@@ -745,7 +747,7 @@ export function generatePrimaryContext (range, role) {
 
 	//console.log('Created Context, TEXT', "'"+textContent+"'", 'CONTEXT', contextText, 'OFFSET', contextOffset);
 
-	return new TextContext({
+	return new TextContext(null, null, {
 		contextText: contextText,
 		contextOffset: contextOffset
 	});
@@ -1770,7 +1772,7 @@ function toReferenceNodeXpathAndOffset (result) {
 	}
 
 	//TODO - must be a Node, not txt?
-	let referencePointer = new ElementDomContentPointer({node: referenceNode, role: 'ancestor'});
+	let referencePointer = new ElementDomContentPointer(null, null, {node: referenceNode, role: 'ancestor'});
 	let adaptedResult = {
 		referencePointer,
 		offset: result.offset
