@@ -75,6 +75,17 @@ function supportedContentRange (contentRangeDescription) {
 }
 
 
+const ANCHOR_LIB_API = {
+	locateElementDomContentPointer,
+	locateRangeEdgeForAnchor
+};
+
+
+function locateRangePointInAncestor(model, ...ancestorNode) {
+	return model.locateRangePointInAncestor(ANCHOR_LIB_API, ...ancestorNode);
+}
+
+
 //FIXME we run into potential problems with this is ContentRangeDescriptions ever occur in different documents
 //or locations but have the same container id.  That seem unlikely but may Need to figure that out eventually
 export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cleanRoot, containers, docElementContainerId) {
@@ -126,7 +137,7 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 			throw new Error('Unable to find container ' + containerId2 + ' in provided doc element');
 		}
 
-		ancestorNode = desc.getAncestor().locateRangePointInAncestor(searchWithin).node || searchWithin;
+		ancestorNode = locateRangePointInAncestor(desc.getAncestor(), searchWithin).node || searchWithin;
 		if (!ancestorNode) {
 			throw new Error('Failed to get ancestor node for description. ' + desc + ' This should happen b/c we should default to ' + searchWithin);
 		}
@@ -201,7 +212,7 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 		if (!searchWithin) {
 			throw new Error('Unable to find container ' + containerId + ' in provided doc element');
 		}
-		ancestorNode = contentRangeDescription.getAncestor().locateRangePointInAncestor(searchWithin).node || searchWithin;
+		ancestorNode = locateRangePointInAncestor(contentRangeDescription.getAncestor(), searchWithin).node || searchWithin;
 
 		if (!ancestorNode) {
 			throw new Error('Failed to get ancestor node for description. ' + contentRangeDescription +
@@ -311,7 +322,7 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 		if (!searchWithin) {
 			throw new Error('Unable to find container ' + containerId + ' in provided doc element');
 		}
-		ancestorNode = contentRangeDescription.getAncestor().locateRangePointInAncestor(searchWithin).node || searchWithin;
+		ancestorNode = locateRangePointInAncestor(contentRangeDescription.getAncestor(), searchWithin).node || searchWithin;
 
 		if (!ancestorNode) {
 			throw new Error('Failed to get ancestor node for description. ' + contentRangeDescription + ' This should happen b/c we should default to ' + searchWithin);
@@ -780,7 +791,7 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 		return loc;
 	}
 
-	startResult = rangeDesc.getStart().locateRangePointInAncestor(ancestor);
+	startResult = locateRangePointInAncestor(rangeDesc.getStart(), ancestor);
 	if (!startResult.node ||
 		!startResult.hasOwnProperty('confidence') ||
 		startResult.confidence === 0) {
@@ -808,7 +819,7 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 		}
 	}
 
-	endResult = rangeDesc.getEnd().locateRangePointInAncestor(ancestor, startResult);
+	endResult = locateRangePointInAncestor(rangeDesc.getEnd(), ancestor, startResult);
 	if (!endResult.node ||
 		!endResult.hasOwnProperty('confidence') ||
 		endResult.confidence === 0) {
@@ -979,7 +990,7 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 		root = root.parentNode;
 	}
 
-	referenceNode = pointer.getAncestor().locateRangePointInAncestor(root).node;
+	referenceNode = locateRangePointInAncestor(pointer.getAncestor(), root).node;
 	foundReferenceNode = true;
 	if (!referenceNode) {
 		foundReferenceNode = false;
@@ -1797,7 +1808,7 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 	}
 
 	let body = docElement.body || findElementsWithTagName(docElement, 'body');
-	let referenceNode = staticResult.referencePointer.locateRangePointInAncestor(body).node;
+	let referenceNode = locateRangePointInAncestor(staticResult.referencePointer, body).node;
 
 	if (!referenceNode) {
 		return null;
