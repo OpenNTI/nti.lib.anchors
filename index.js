@@ -1,22 +1,24 @@
 /*globals document, NodeFilter*/
-import isElement from 'nti.lib.domjs/lib/iselement';
-import isTextNode from 'nti.lib.domjs/lib/istextnode';
+import isElement from 'nti.lib.dom/lib/iselement';
+import isTextNode from 'nti.lib.dom/lib/istextnode';
 
-import getTextNodes from 'nti.lib.domjs/lib/gettextnodes';
-import hasClass from 'nti.lib.domjs/lib/hasclass';
-import matchesSelector from 'nti.lib.domjs/lib/matches';
-import parentFor from 'nti.lib.domjs/lib/parent';
-import removeNode from 'nti.lib.domjs/lib/removenode';
+import getTextNodes from 'nti.lib.dom/lib/gettextnodes';
+import hasClass from 'nti.lib.dom/lib/hasclass';
+import matchesSelector from 'nti.lib.dom/lib/matches';
+import parentFor from 'nti.lib.dom/lib/parent';
+import removeNode from 'nti.lib.dom/lib/removenode';
 
 import isEmpty from 'nti.lib.interfaces/utils/isempty';
 
-import ContentRangeDescription from 'nti.lib.interfaces/models/anchors/ContentRagneDescription';
-import DomContentRangeDescription from 'nti.lib.interfaces/models/anchors/DomContentRagneDescription';
+import {getModel} from 'nti.lib.interfaces';
 
-import ElementDomContentPointer from 'nti.lib.interfaces/models/anchors/ElementDomContentPointer';
-import TextDomContentPointer from 'nti.lib.interfaces/models/anchors/TextDomContentPointer';
+const ContentRangeDescription = getModel('contentrange.contentrangedescription');
+const DomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
 
-import TextContext from 'nti.lib.interfaces/models/anchors/TextContext';
+const ElementDomContentPointer = getModel('contentrange.elementdomcontentpointer');
+const TextDomContentPointer = getModel('contentrange.textdomcontentpointer');
+
+const TextContext = getModel('contentrange.textcontext');
 
 const CONTAINER_SELECTORS = [
 	'object[type$=naquestion][data-ntiid]',
