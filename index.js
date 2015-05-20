@@ -1819,7 +1819,7 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 		return null;
 	}
 
-	let body = docElement.body || findElementsWithTagName(docElement, 'body');
+	let body = docElement.body || findElementsWithTagName(docElement, 'body')[0] || docElement;
 	let referenceNode = locateRangePointInAncestor(staticResult.referencePointer, body).node;
 
 	if (!referenceNode) {
