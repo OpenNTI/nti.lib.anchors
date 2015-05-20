@@ -242,6 +242,14 @@ function findElementsWithTagName (root, name) {
 }
 
 
+function createRange(contextNode) {
+	if (!contextNode.createRange) {
+		contextNode = contextNode.ownerDocument || document;
+	}
+	return contextNode.createRange();
+}
+
+
 /*
  *	Returns a boolean indicating whether or not the provided contentRangeDescription
  *  can be found in the provided node
@@ -351,7 +359,7 @@ function createEmptyContentRangeDescription (docElement, containerId, rootId) {
 	}
 
 	//console.debug('Given an empty content range description, returning a range wrapping the container', searchWithin);
-	resultRange = docElement.createRange();
+	resultRange = createRange(docElement);
 	resultRange.selectNode(searchWithin);
 	return resultRange;
 }
@@ -885,7 +893,7 @@ function convertContentRangeToDomRange (startResult, endResult, docElement) {
 		return null;
 	}
 
-	range = docElement.createRange();
+	range = createRange(docElement);
 	if (liveStartResult.hasOwnProperty('offset')) {
 		range.setStart(liveStartResult.container, liveStartResult.offset);
 	}
@@ -1314,7 +1322,7 @@ function makeRangeAnchorable (range, docElement) {
 	}
 
 	//If we get here, we got good nodes, figure out the best way to create the range now:
-	newRange = docElement.createRange();
+	newRange = createRange(docElement);
 
 	//case 1: a single node
 	if (startEdgeNode === endEdgeNode) {
@@ -1544,7 +1552,7 @@ export function isNodeAnchorable (theNode, unsafeAnchorsAllowed) {
 /* tested */
 export function purifyRange (range, doc) {
 	let docFrag,
-		tempRange = doc.createRange(),
+		tempRange = createRange(doc),
 		origStartNode = range.startContainer,
 		origEndNode = range.endContainer,
 		origStartOff = range.startOffset,
@@ -1608,7 +1616,7 @@ export function purifyRange (range, doc) {
 	newEndOffset = cleanNode(endEdge, 'end');
 
 	//build the new range divorced from the dom and return:
-	resultRange = doc.createRange();
+	resultRange = createRange(doc);
 	if (!startEdge && !isTextNode(endEdge)) {
 		resultRange.selectNodeContents(endEdge);
 	}
