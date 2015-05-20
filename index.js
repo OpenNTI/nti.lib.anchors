@@ -2019,7 +2019,7 @@ export function isMathChild (node) {
 }
 
 
-function expandRangeToIncludeMath (range) {
+export function expandRangeToIncludeMath (range) {
 	if (!range) {
 		return null;
 	}
