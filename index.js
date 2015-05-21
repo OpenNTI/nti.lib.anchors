@@ -1,12 +1,5 @@
 /*globals document, NodeFilter*/
-import isElement from 'nti.lib.dom/lib/iselement';
-import isTextNode from 'nti.lib.dom/lib/istextnode';
-
-import getTextNodes from 'nti.lib.dom/lib/gettextnodes';
-import hasClass from 'nti.lib.dom/lib/hasclass';
-import matchesSelector from 'nti.lib.dom/lib/matches';
-import parentFor from 'nti.lib.dom/lib/parent';
-import removeNode from 'nti.lib.dom/lib/removenode';
+import * as DOM from 'nti.lib.dom';
 
 import isEmpty from 'nti.lib.interfaces/utils/isempty';
 
@@ -445,7 +438,7 @@ export function createRangeDescriptionFromRange (range, docElement) {
 
 	//If the ancestorcontainer is a text node, we want a containing element as per the docs
 	//NOTE: use range, not pureRange here because the pureRange's ancestor is probably a doc fragment.
-	if (isTextNode(ancestorNode)) {
+	if (DOM.isTextNode(ancestorNode)) {
 		ancestorNode = ancestorNode.parentNode;
 	}
 	ancestorNode = referenceNodeForNode(ancestorNode);
@@ -513,7 +506,7 @@ function getContainerNode (containerId, root, defaultNode) {
 	result = potentials[0];
 
 	for(let sel of CONTAINER_SELECTORS) {
-		isContainerNode = isContainerNode || matchesSelector(result, sel);
+		isContainerNode = isContainerNode || DOM.matches(result, sel);
 	}
 
 	if (!isContainerNode) {
@@ -539,7 +532,7 @@ function getContainerNtiid (node, def) {
 		if (!x) {
 			return false;
 		}
-		return matchesSelector(x, sel) ? x : parentFor(node, sel);
+		return DOM.matches(x, sel) ? x : DOM.parent(node, sel);
 	}
 
 	function nodeIfObject (x) {
@@ -587,11 +580,11 @@ function doesElementMatchPointer (element, pointer) {
 function createPointer (range, role, node) {
 	let edgeNode = node || nodeThatIsEdgeOfRange(range, (role === 'start'));
 
-	if (isTextNode(edgeNode)) {
+	if (DOM.isTextNode(edgeNode)) {
 		return createTextPointerFromRange(range, role);
 	}
 
-	if (isElement(edgeNode)) {
+	if (DOM.isElement(edgeNode)) {
 		return new ElementDomContentPointer(null, null, {
 			elementTagName: edgeNode.tagName,
 			elementId: edgeNode.getAttribute('data-ntiid') || edgeNode.getAttribute('id'),
@@ -629,7 +622,7 @@ export function createTextPointerFromRange (range, role) {
 		nextSiblingFunction,
 		sibling;
 
-	if (!isTextNode(container)) {
+	if (!DOM.isTextNode(container)) {
 		container = nodeThatIsEdgeOfRange(range, (role === 'start'));
 		offset = role === 'start' ? 0 : container.textContent.length;
 	}
@@ -732,7 +725,7 @@ export function generatePrimaryContext (range, role) {
 		offset = range.endOffset;
 	}
 
-	if (!isTextNode(container)) {
+	if (!DOM.isTextNode(container)) {
 		container = nodeThatIsEdgeOfRange(range, (role === 'start'));
 		offset = role === 'start' ? 0 : container.textContent.length;
 	}
@@ -1025,7 +1018,7 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 	}
 
 	//We may be in the same textNode as start
-	if (isTextNode(treeWalker.currentNode)) {
+	if (DOM.isTextNode(treeWalker.currentNode)) {
 		textNode = treeWalker.currentNode;
 	}
 	else {
@@ -1311,7 +1304,7 @@ function makeRangeAnchorable (range, docElement) {
 	}
 	if (!isNodeAnchorable(endEdgeNode)) {
 		endEdgeNode = searchFromRangeEndInwardForAnchorableNode(endEdgeNode);
-		if (isTextNode(endEdgeNode)) {
+		if (DOM.isTextNode(endEdgeNode)) {
 			endOffset = endEdgeNode.nodeValue.length;
 		}
 	}
@@ -1331,14 +1324,14 @@ function makeRangeAnchorable (range, docElement) {
 	//case2: nodes are different, handle each:
 	else {
 		//start:
-		if (isTextNode(startEdgeNode)) {
+		if (DOM.isTextNode(startEdgeNode)) {
 			newRange.setStart(startEdgeNode, startOffset);
 		}
 		else {
 			newRange.setStartBefore(startEdgeNode);
 		}
 		//end:
-		if (isTextNode(endEdgeNode)) {
+		if (DOM.isTextNode(endEdgeNode)) {
 			newRange.setEnd(endEdgeNode, endOffset);
 		}
 		else {
@@ -1447,7 +1440,7 @@ export function nodeThatIsEdgeOfRange (range, start) {
 
 
 	//If the container is a textNode look no further, that node is the edge
-	if (isTextNode(container)) {
+	if (DOM.isTextNode(container)) {
 		return container;
 	}
 
@@ -1459,7 +1452,7 @@ export function nodeThatIsEdgeOfRange (range, start) {
 		if (!cont) {
 			return container;
 		}
-		if (isTextNode(cont) && cont.textContent.trim().length < 1) {
+		if (DOM.isTextNode(cont) && cont.textContent.trim().length < 1) {
 			return container;
 		}
 		return container.childNodes.item(offset);
@@ -1503,7 +1496,7 @@ export function isNodeAnchorable (theNode, unsafeAnchorsAllowed) {
 		}
 
 		//Most common is text
-		if (isTextNode(node)) {
+		if (DOM.isTextNode(node)) {
 			//We don't want to try to anchor to empty text nodes
 			return node.nodeValue.trim().length > 0;
 		}
@@ -1543,7 +1536,7 @@ export function isNodeAnchorable (theNode, unsafeAnchorsAllowed) {
 	//If the itself is anchorable make sure its not in a parent
 	//that claims nothing is anchorable
 	if (isNodeItselfAnchorable(theNode, unsafeAnchorsAllowed)) {
-		return !parentFor(theNode, '[' + NO_ANCHORABLE_CHILDREN_ATTRIBUTE + ']');
+		return !DOM.parent(theNode, '[' + NO_ANCHORABLE_CHILDREN_ATTRIBUTE + ']');
 	}
 	return false;
 }
@@ -1569,7 +1562,7 @@ export function purifyRange (range, doc) {
 		newEndOffset;
 
 	//make sure the common ancestor is anchorable, otherwise we have a problem, climb to one that is
-	while (ancestor && (!isNodeAnchorable(ancestor) || isTextNode(ancestor))) {
+	while (ancestor && (!isNodeAnchorable(ancestor) || DOM.isTextNode(ancestor))) {
 		ancestor = ancestor.parentNode;
 	}
 	if (!ancestor) {
@@ -1617,19 +1610,19 @@ export function purifyRange (range, doc) {
 
 	//build the new range divorced from the dom and return:
 	resultRange = createRange(doc);
-	if (!startEdge && !isTextNode(endEdge)) {
+	if (!startEdge && !DOM.isTextNode(endEdge)) {
 		resultRange.selectNodeContents(endEdge);
 	}
 	else {
 		resultRange.selectNodeContents(docFrag);
-		if (isTextNode(startEdge)) {
+		if (DOM.isTextNode(startEdge)) {
 			resultRange.setStart(startEdge, newStartOffset);
 		}
 		else {
 			resultRange.setStartBefore(startEdge);
 		}
 
-		if (isTextNode(endEdge)) {
+		if (DOM.isTextNode(endEdge)) {
 			resultRange.setEnd(endEdge, newEndOffset);
 		}
 		else {
@@ -1656,7 +1649,7 @@ export function purifyNode (docFrag) {
 
 	for(let trash of remove) {
 		for(let el of docFrag.querySelectorAll(trash)) {
-			removeNode(el);
+			DOM.removeNode(el);
 		}
 	}
 
@@ -1681,7 +1674,7 @@ export function purifyNode (docFrag) {
 	// function fallbackNormalize(node) {
 	// 	var i = 0, nc = node.childNodes;
 	// 	while (i < nc.length) {
-	// 		while (isTextNode(nc[i]) && i + 1 < nc.length && isTextNode(nc[i + 1])) {
+	// 		while (DOM.isTextNode(nc[i]) && i + 1 < nc.length && DOM.isTextNode(nc[i + 1])) {
 	// 			nc[i].data += nc[i + 1].data;
 	// 			node.removeChild(nc[i + 1]);
 	// 		}
@@ -1703,7 +1696,7 @@ export function tagNode (node, tag, textOffset) {
 	let attr = PURIFICATION_TAG,
 			start, end;
 
-	if (isTextNode(node)) {
+	if (DOM.isTextNode(node)) {
 		start = node.textContent.substring(0, textOffset);
 		end = node.textContent.substring(textOffset);
 		node.textContent = start + '[' + attr + ':' + tag + ']' + end;
@@ -1724,7 +1717,7 @@ export function cleanNode (node, tag) {
 		return null;
 	}
 
-	if (isTextNode(node)) {
+	if (DOM.isTextNode(node)) {
 		tagSelector = '[' + attr + ':' + tag + ']';
 		offset = node.textContent.indexOf(tagSelector);
 		if (offset >= 0) {
@@ -1746,7 +1739,7 @@ export function findTaggedNode (root, tag) {
 		temp = root;
 
 	while (temp) {
-		if (isTextNode(temp)) {
+		if (DOM.isTextNode(temp)) {
 			if (temp.textContent.indexOf(selector) >= 0) {
 				return temp; //found it
 			}
@@ -1774,7 +1767,7 @@ export function findTaggedNode (root, tag) {
 function toReferenceNodeXpathAndOffset (result) {
 	//get a reference node that is NOT a text node...
 	let referenceNode = referenceNodeForNode(result.node, true);
-	while (referenceNode && isTextNode(referenceNode)) {
+	while (referenceNode && DOM.isTextNode(referenceNode)) {
 		referenceNode = referenceNodeForNode(referenceNode.parentNode, true);
 	}
 	if (!referenceNode) {
@@ -1838,7 +1831,7 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 
 	while (parts.length > 1) {
 
-		if (isTextNode(container)) {
+		if (DOM.isTextNode(container)) {
 			console.error('Expected a non text node.  Expect errors', container);
 		}
 
@@ -1891,8 +1884,8 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 
 		//If child is a textNode we want to advance to the last
 		//nextnode adjacent to it.
-		if (isTextNode(child)) {
-			while (i < childrenWithSyntheticsRemoved.length - 1 && isTextNode(childrenWithSyntheticsRemoved[i + 1])) {
+		if (DOM.isTextNode(child)) {
+			while (i < childrenWithSyntheticsRemoved.length - 1 && DOM.isTextNode(childrenWithSyntheticsRemoved[i + 1])) {
 				i++;
 			}
 		}
@@ -1909,7 +1902,7 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 	//We've been asked to resolve an offset at the same time
 	if (offset !== null) {
 		//If the container isn't a text node, the offset is the ith child
-		if (!isTextNode(child)) {
+		if (!DOM.isTextNode(child)) {
 			result = {container: ithChildAccountingForSyntheticNodes(child, offset, null)};
 			//console.log('Returning result from child is not textnode branch', result);
 			return result;
@@ -1917,7 +1910,7 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 
 		while (i < childrenWithSyntheticsRemoved.length) {
 			textNode = childrenWithSyntheticsRemoved[i];
-			if (!isTextNode(textNode)) {
+			if (!DOM.isTextNode(textNode)) {
 				break;
 			}
 
@@ -1948,9 +1941,9 @@ function childrenIfSyntheticsRemoved (node) {
 		children = node.childNodes,
 		child;
 
-	if (matchesSelector(node, 'span.application-highlight.counter') ||
-		matchesSelector(node, 'span.redactionAction') ||
-		matchesSelector(node, 'span.blockRedactionAction')) {
+	if (DOM.matches(node, 'span.application-highlight.counter') ||
+		DOM.matches(node, 'span.redactionAction') ||
+		DOM.matches(node, 'span.blockRedactionAction')) {
 		//ignore children:
 		//console.log('ignoring children of', node, 'when finding non synthetic kids');
 		return [];
@@ -1972,13 +1965,13 @@ function childrenIfSyntheticsRemoved (node) {
 /* tested */
 export function cleanRangeFromBadStartAndEndContainers (range) {
 	function isBlankTextNode(n) {
-		return (isTextNode(n) && n.textContent.trim().length === 0);
+		return (DOM.isTextNode(n) && n.textContent.trim().length === 0);
 	}
 
 	let startContainer = range.startContainer,
 		endContainer = range.endContainer,
-		ancestor = isTextNode(range.commonAncestorContainer) ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer,
-		txtNodes = getTextNodes(ancestor);
+		ancestor = DOM.isTextNode(range.commonAncestorContainer) ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer,
+		txtNodes = DOM.getTextNodes(ancestor);
 
 
 	if (isBlankTextNode(startContainer)) {
@@ -2010,12 +2003,12 @@ export function isMathChild (node) {
 	if (!node) {
 		return false;
 	}
-	if (!isTextNode(node) && hasClass(node, 'math')) {
+	if (!DOM.isTextNode(node) && DOM.hasClass(node, 'math')) {
 		//top level math is not a math child :)
 		return false;
 	}
 
-	return !!parentFor(node, '.math');
+	return !!DOM.parent(node, '.math');
 }
 
 
@@ -2025,11 +2018,11 @@ export function expandRangeToIncludeMath (range) {
 	}
 
 	if (isMathChild(range.startContainer)) {
-		range.setStartBefore(parentFor(range.startContainer, '.math'));
+		range.setStartBefore(DOM.parent(range.startContainer, '.math'));
 	}
 
 	if (isMathChild(range.endContainer)) {
-		range.setEndAfter(parentFor(range.endContainer, '.math'));
+		range.setEndAfter(DOM.parent(range.endContainer, '.math'));
 	}
 }
 
