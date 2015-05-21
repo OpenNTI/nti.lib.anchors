@@ -1,11 +1,16 @@
 /*global document, window*/
 import isEmpty from 'nti.lib.interfaces/utils/isempty';
 
-import RealDomContentPointer from 'nti.lib.interfaces/models/anchors/DomContentPointer';
-import RealElementDomContentPointer from 'nti.lib.interfaces/models/anchors/ElementDomContentPointer';
-import RealTextDomContentPointer from 'nti.lib.interfaces/models/anchors/TextDomContentPointer';
-import RealDomContentRangeDescription from 'nti.lib.interfaces/models/anchors/DomContentRangeDescription';
-import RealTextContext from 'nti.lib.interfaces/models/anchors/TextContext';
+import {getModel} from 'nti.lib.interfaces';
+
+const RealDomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
+
+const RealDomContentPointer = getModel('contentrange.domcontentpointer');
+const RealElementDomContentPointer = getModel('contentrange.elementdomcontentpointer');
+const RealTextDomContentPointer = getModel('contentrange.textdomcontentpointer');
+
+const RealTextContext = getModel('contentrange.textcontext');
+
 
 
 class DomContentPointer extends RealDomContentPointer { constructor(o) { super(null, null, o); } }
