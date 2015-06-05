@@ -2,7 +2,7 @@
 	"name": "nti.lib.anchorjs",
 	"version": "1.0.0",
 	"description": "Content Anchor handling library",
-
+	"private": true,
 	"main": "index.js",
 
 	"scripts": {
@@ -13,7 +13,7 @@
 		"url": "ssh://repos.nextthought.com/nti.lib.anchorjs"
 	},
 	"author": "",
-	"license": "private",
+
 
 	"dependencies": {
 		"nti.lib.dom": "git+https://repos.nextthought.com/git/nti.lib.domjs",
