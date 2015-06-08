@@ -558,7 +558,7 @@ function getContainerNtiid (node, def) {
 
 	//ok its not in a subcontainer, return default
 	if (def && typeof def !== 'string') {
-		n = def.getElementById('NTIContent') || {};
+		n = def.querySelector('[data-page-ntiid]') || {};
 		n = n.getAttribute && n.getAttribute('data-page-ntiid');
 		if (n) {
 			def = n;
