@@ -571,8 +571,18 @@ function getContainerNtiid (node, def) {
 
 function doesElementMatchPointer (element, pointer) {
 	let id = element.id || (element.getAttribute ? element.getAttribute('id') : null);
-	return (id === pointer.elementId || (element.getAttribute && element.getAttribute('data-ntiid') === pointer.elementId)) &&
-		element.tagName.toUpperCase() === pointer.elementTagName.toUpperCase();
+	let tag = element.tagName.toUpperCase();
+
+	let pointerTag = pointer.elementTagName.toUpperCase();
+
+	let idMatches = (id === pointer.elementId || (element.getAttribute && element.getAttribute('data-ntiid') === pointer.elementId));
+	let tagMatches = tag === pointerTag;
+
+	if (!tagMatches && pointer.elementId === 'NTIContent' && tag === 'NTI-CONTENT') {
+		tagMatches = true;
+	}
+
+	return idMatches && tagMatches;
 }
 
 
