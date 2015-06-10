@@ -28,7 +28,7 @@ import {
 	createRangeDescriptionFromRange,
 	createTextPointerFromRange,
 	doesContentRangeDescriptionResolve,
-	expandRangeToIncludeMath,
+	expandRangeToIncludeImmutableBlocks,
 	findTaggedNode,
 	firstWordFromString,
 	generateAdditionalContext,
@@ -1877,9 +1877,9 @@ describe('Anchors', () => {
 		});
 	});
 
-	describe('expandRangeToIncludeMath Tests', () => {
+	describe('expandRangeToIncludeImmutableBlocks Tests', () => {
 		it('Null Range', () => {
-			expect(expandRangeToIncludeMath(null)).toBeFalsy();
+			expect(expandRangeToIncludeImmutableBlocks(null)).toBeFalsy();
 		});
 
 		it('Range With No Math', () => {
@@ -1911,7 +1911,7 @@ describe('Anchors', () => {
 			range.setStart(text1, 0);
 			range.setEnd(text4, 1);
 
-			expandRangeToIncludeMath(range);
+			expandRangeToIncludeImmutableBlocks(range);
 			expect(range.commonAncestorContainer).toBe(div);
 			expect(range.startContainer).toBe(text1);
 			expect(range.endContainer).toBe(text4);
@@ -1946,7 +1946,7 @@ describe('Anchors', () => {
 			range.setStart(text2, 2);
 			range.setEnd(text4, 2);
 
-			expandRangeToIncludeMath(range);
+			expandRangeToIncludeImmutableBlocks(range);
 
 			expect(range.commonAncestorContainer).toBe(div);
 			expect(range.startContainer).toBe(div);
@@ -1983,7 +1983,7 @@ describe('Anchors', () => {
 			range.setStart(text1, 0);
 			range.setEnd(text3, 1);
 
-			expandRangeToIncludeMath(range);
+			expandRangeToIncludeImmutableBlocks(range);
 			expect(range.commonAncestorContainer).toBe(div);
 			expect(range.startContainer).toBe(text1);
 			expect(range.endContainer).toBe(div);
@@ -2019,7 +2019,7 @@ describe('Anchors', () => {
 			range.setStart(text2, 0);
 			range.setEnd(text3, 1);
 
-			expandRangeToIncludeMath(range);
+			expandRangeToIncludeImmutableBlocks(range);
 			expect(range.commonAncestorContainer).toBe(div);
 			expect(range.startContainer).toBe(div);
 			expect(range.startOffset).toBe(1);

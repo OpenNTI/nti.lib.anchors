@@ -2022,26 +2022,43 @@ export function isMathChild (node) {
 }
 
 
-export function expandRangeToIncludeMath (range) {
+function getImmutableBlockParent (node) {
+	let query = x => DOM.parent(node, `*:not(${x}) > ${x}`);
+
+	let immutables = ['.math', '[data-reactid]']
+		.map(query)
+		.filter(x => x);
+
+
+	return immutables.length <= 1
+		? immutables[0]
+		: immutables.reduce((a, b) => a.contains(b) ? a : b);
+}
+
+
+export function expandRangeToIncludeImmutableBlocks (range) {
 	if (!range) {
 		return null;
 	}
 
-	if (isMathChild(range.startContainer)) {
-		range.setStartBefore(DOM.parent(range.startContainer, '.math'));
+	let start = getImmutableBlockParent(range.startContainer);
+	let end = getImmutableBlockParent(range.endContainer);
+
+	if (start) {
+		range.setStartBefore(start);
 	}
 
-	if (isMathChild(range.endContainer)) {
-		range.setEndAfter(DOM.parent(range.endContainer, '.math'));
+	if (end) {
+		range.setEndAfter(end);
 	}
 }
 
 
-export function expandSelectionToIncludeMath (sel) {
+export function expandSelectionToIncludeImmutableBlocks (sel) {
 	let range = sel.getRangeAt(0);
 	if (range) {
 		sel.removeAllRanges();
-		expandRangeToIncludeMath(range);
+		expandRangeToIncludeImmutableBlocks(range);
 		sel.addRange(range);
 	}
 
