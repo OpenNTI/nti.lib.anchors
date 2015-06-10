@@ -14,8 +14,8 @@ const TextDomContentPointer = getModel('contentrange.textdomcontentpointer');
 const TextContext = getModel('contentrange.textcontext');
 
 const CONTAINER_SELECTORS = [
-	'object[type$=naquestion][data-ntiid]',
-	'object[type$=ntivideo][data-ntiid]'
+	'[type$=naquestion][data-ntiid]',
+	'[type$=ntivideo][data-ntiid]'
 ];
 
 //To control some logging
@@ -44,6 +44,12 @@ const IGNORE_WHITESPACE_TEXTNODE_FILTER = {
 	}
 };
 
+
+function escapeId (id) {
+	return id.replace(/:/g, '\\3a ') //no colons
+			.replace(/,/g, '\\2c ')//no commas
+			.replace(/\./g, '\\2e ');//no periods
+}
 
 function getWhitespaceFilter () {
 	if (!IGNORE_WHITESPACE_TEXTNODES) {
@@ -479,7 +485,7 @@ function getContainerNode (containerId, root, defaultNode) {
 
 
 	if (containerId.indexOf('tag:nextthought.com') >= 0) {
-		for(let x of root.querySelectorAll('[data-ntiid]')) {
+		for(let x of root.querySelectorAll(`[data-ntiid=${escapeId(containerId)}]`)) {
 			if (x.getAttribute('data-ntiid') === containerId) {
 				potentials.push(x);
 			}
@@ -490,7 +496,7 @@ function getContainerNode (containerId, root, defaultNode) {
 			potentials.push(root.getElementById(containerId));
 		}
 		else {
-			potentials = root.querySelectorAll('[id="' + containerId + '"]');
+			potentials = root.querySelectorAll(`[id="${escapeId(containerId)}"]`);
 		}
 	}
 
@@ -513,7 +519,7 @@ function getContainerNode (containerId, root, defaultNode) {
 		console.warn('Found container we think is an invalid container node', result);
 	}
 
-	return result.dom;
+	return result;
 }
 
 
@@ -2023,7 +2029,7 @@ export function isMathChild (node) {
 
 
 function getImmutableBlockParent (node) {
-	let query = x => DOM.parent(node, `*:not(${x}) > ${x}`);
+	let query = x => DOM.parent(node, `.page-contents *:not(${x}) > ${x}`);
 
 	let immutables = ['.math', '[data-reactid]']
 		.map(query)
