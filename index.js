@@ -943,11 +943,11 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 		}
 		else {
 			//Note this may not technically be an exact match, but the potentials loop below should weed out any issues
-			potentials = ancestor.querySelectorAll('[data-ntiid^="' + parts.first() + '"][data-ntiid$="' + parts.last() + '"]');
+			potentials = ancestor.querySelectorAll(`[data-ntiid^="${parts[0]}"][data-ntiid$="${parts[parts.length - 1]}"]`);
 		}
 	}
 	else {
-		potentials = ancestor.querySelectorAll('[id="' + theId + '"]');
+		potentials = ancestor.querySelectorAll(`[id="${theId}"]`);
 	}
 
 
