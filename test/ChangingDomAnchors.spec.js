@@ -20,7 +20,7 @@ describe('Tests with Changing Documents', ()=> {
 	afterEach(() => document.body.removeChild(testBody));
 
 
-	function addElement(daddy, tag, attrs) {
+	function addElement (daddy, tag, attrs) {
 		let sonny = document.createElement(tag);
 
 		for (let a of Object.keys(attrs)) {
@@ -34,7 +34,7 @@ describe('Tests with Changing Documents', ()=> {
 	}
 
 
-	function insertElement(daddy, bigBrother, tag, attrs) {
+	function insertElement (daddy, bigBrother, tag, attrs) {
 		let sonny = document.createElement(tag);
 		for (let a of Object.keys(attrs)) { sonny.setAttribute(a, attrs[a]); }
 		if (daddy) { daddy.insertBefore(sonny, bigBrother); }
@@ -42,14 +42,14 @@ describe('Tests with Changing Documents', ()=> {
 	}
 
 
-	function addTextNode(daddy, text) {
+	function addTextNode (daddy, text) {
 		let sonny = document.createTextNode(text);
 		if (daddy) { daddy.appendChild(sonny); }
 		return sonny;
 	}
 
 
-	function makeRange(sn, so, fn, fo) {
+	function makeRange (sn, so, fn, fo) {
 		let range = document.createRange();
 		range.setStart(sn, so);
 		range.setEnd(fn, fo);

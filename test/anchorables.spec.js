@@ -13,11 +13,11 @@ const RealTextContext = getModel('contentrange.textcontext');
 
 
 
-class DomContentPointer extends RealDomContentPointer { constructor(o) { super(null, null, o); } }
-class ElementDomContentPointer extends RealElementDomContentPointer { constructor(o) { super(null, null, o); } }
-class TextDomContentPointer extends RealTextDomContentPointer { constructor(o) { super(null, null, o); } }
-class DomContentRangeDescription extends RealDomContentRangeDescription { constructor(o) { super(null, null, o); } }
-class TextContext extends RealTextContext { constructor(o) { super(null, null, o); } }
+class DomContentPointer extends RealDomContentPointer { constructor (o) { super(null, null, o); } }
+class ElementDomContentPointer extends RealElementDomContentPointer { constructor (o) { super(null, null, o); } }
+class TextDomContentPointer extends RealTextDomContentPointer { constructor (o) { super(null, null, o); } }
+class DomContentRangeDescription extends RealDomContentRangeDescription { constructor (o) { super(null, null, o); } }
+class TextContext extends RealTextContext { constructor (o) { super(null, null, o); } }
 
 import {
 	PURIFICATION_TAG,
@@ -1359,7 +1359,7 @@ describe('Anchors', () => {
 
 	describe('containsFullContext tests', () => {
 		it('containsFullContext works fine', () => {
-			function makeContexts(array) {
+			function makeContexts (array) {
 				let contexts = [];
 				for (let i = 0; i < array.length; i++) {
 					contexts.push({ contextText: array[i] });

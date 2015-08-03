@@ -84,7 +84,7 @@ const ANCHOR_LIB_API = {
 };
 
 
-function locateRangePointInAncestor(model, ...ancestorNode) {
+function locateRangePointInAncestor (model, ...ancestorNode) {
 	return model.locateRangePointInAncestor(ANCHOR_LIB_API, ...ancestorNode);
 }
 
@@ -101,7 +101,7 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 		throw new Error('toDomRanges requires contentRangeDescriptions and containers to be the same length if containers provided');
 	}
 
-	function getVirginNode(node) {
+	function getVirginNode (node) {
 		let theId = node.getAttribute('id'),
 			key = theId || node,
 			clean;
@@ -118,7 +118,7 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 		return clean;
 	}
 
-	function cacheLocatorForDescription(desc, docElement2, cleanRoot2, containerId2, docElementContainerId2) {
+	function cacheLocatorForDescription (desc, docElement2, cleanRoot2, containerId2, docElementContainerId2) {
 		let searchWithin, ancestorNode, virginNode;
 
 		if (!containerId2) {
@@ -241,7 +241,7 @@ function findElementsWithTagName (root, name) {
 }
 
 
-function createRange(contextNode) {
+function createRange (contextNode) {
 	if (!contextNode.createRange) {
 		contextNode = contextNode.ownerDocument || document;
 	}
@@ -293,7 +293,7 @@ export function doesContentRangeDescriptionResolve (contentRangeDescription, nod
 //TODO lots of duplicated code here
 function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc) {
 	let ancestorNode, resultRange, searchWithin, containerId, docElementContainerId,
-			docElement = (cleanRoot && cleanRoot.ownerDocument) || doc, locator;
+		docElement = (cleanRoot && cleanRoot.ownerDocument) || doc, locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
 		console.warn('nothing to parse?');
@@ -534,7 +534,7 @@ function getContainerNode (containerId, root, defaultNode) {
 function getContainerNtiid (node, def) {
 	let n = node, ntiidAttr = 'data-ntiid', containerNode;
 
-	function ancestorOrSelfMatchingSelector(x, sel) {
+	function ancestorOrSelfMatchingSelector (x, sel) {
 		if (!x) {
 			return false;
 		}
@@ -1144,7 +1144,7 @@ function getCurrentNodeMatches (pointer, treeWalker) {
 		siblingFunction = isStart ? treeWalker.previousNode : treeWalker.nextNode,
 		confidenceMultiplier = 1;
 
-	function multiIndexOf(str, tomatch) {
+	function multiIndexOf (str, tomatch) {
 		let all = [], next = -2;
 		while (next !== -1) {
 			next = str.indexOf(tomatch, next + 1);
@@ -1155,7 +1155,7 @@ function getCurrentNodeMatches (pointer, treeWalker) {
 		return all;
 	}
 
-	function getPrimaryContextMatches(context, node, start) {
+	function getPrimaryContextMatches (context, node, start) {
 		if (!node) {
 			return [];
 		}
@@ -1187,7 +1187,7 @@ function getCurrentNodeMatches (pointer, treeWalker) {
 		return allmatches;
 	}
 
-	function secondaryContextMatch(context, node, start) {
+	function secondaryContextMatch (context, node, start) {
 		if (!node) {
 			return 0;
 		}
@@ -1399,7 +1399,7 @@ function searchFromRangeEndInwardForAnchorableNode (endNode) {
 
 	endNode = walkDownToLastNode(endNode);
 
-	function recurse(n) {
+	function recurse (n) {
 		if (!n) {
 			return null;
 		}
@@ -1501,7 +1501,7 @@ export function isNodeAnchorable (theNode, unsafeAnchorsAllowed) {
 		return false;
 	}
 
-	function isNodeItselfAnchorable(node, allowUnsafeAnchors) {
+	function isNodeItselfAnchorable (node, allowUnsafeAnchors) {
 		//distill the possible ids into an id var for easier reference later
 		let id = node.id || (node.getAttribute ? node.getAttribute('id') : null),
 			ntiid = node.getAttribute ? node.getAttribute('data-ntiid') : null,
@@ -1710,7 +1710,7 @@ export function purifyNode (docFrag) {
 /* tested */
 export function tagNode (node, tag, textOffset) {
 	let attr = PURIFICATION_TAG,
-			start, end;
+		start, end;
 
 	if (DOM.isTextNode(node)) {
 		start = node.textContent.substring(0, textOffset);
@@ -1726,7 +1726,7 @@ export function tagNode (node, tag, textOffset) {
 /* tested */
 export function cleanNode (node, tag) {
 	let attr = PURIFICATION_TAG,
-			tagSelector, offset;
+		tagSelector, offset;
 
 	//generic protection:
 	if (!node) {
@@ -1980,7 +1980,7 @@ function childrenIfSyntheticsRemoved (node) {
 
 /* tested */
 export function cleanRangeFromBadStartAndEndContainers (range) {
-	function isBlankTextNode(n) {
+	function isBlankTextNode (n) {
 		return (DOM.isTextNode(n) && n.textContent.trim().length === 0);
 	}
 
