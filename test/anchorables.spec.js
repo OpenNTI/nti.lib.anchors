@@ -1286,10 +1286,10 @@ describe('Anchors', () => {
 
 		it('Invalid Pointer', () => {
 			let pointer = new ElementDomContentPointer({
-					role: 'start',
-					elementTagName: 'div',
-					elementId: '12345'
-				});
+				role: 'start',
+				elementTagName: 'div',
+				elementId: '12345'
+			});
 
 			//send in doc.body for maximum workage
 			try {
