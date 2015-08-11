@@ -432,10 +432,9 @@ export function createRangeDescriptionFromRange (range, docElement) {
 		throw new Error('Anchorable range for range could not be found');
 	}
 
-	let pureRange = purifyRange(range, docElement),
-		ancestorAnchor,
-		ancestorNode = range.commonAncestorContainer,
-		result = {};
+	let pureRange = purifyRange(range, docElement);
+	let ancestorNode = range.commonAncestorContainer;
+	let result = {};
 
 	if (!pureRange || pureRange.collapsed) {
 		console.error('Unable to purify anchorable range', range, pureRange);
@@ -447,11 +446,12 @@ export function createRangeDescriptionFromRange (range, docElement) {
 	if (DOM.isTextNode(ancestorNode)) {
 		ancestorNode = ancestorNode.parentNode;
 	}
+
 	ancestorNode = referenceNodeForNode(ancestorNode);
 
 	result.container = getContainerNtiid(ancestorNode, docElement);
 
-	ancestorAnchor = new ElementDomContentPointer(null, null, {
+	let ancestorAnchor = new ElementDomContentPointer(null, null, {
 		node: ancestorNode,
 		role: 'ancestor'
 	});
