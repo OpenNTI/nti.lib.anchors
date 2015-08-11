@@ -1767,7 +1767,7 @@ export function findTaggedNode (root, tag) {
 			}
 
 		}
-		else {
+		else if (!temp || temp.nodeType !== 11) {
 			console.warn('skipping node while looking for tag', temp);
 		}
 
