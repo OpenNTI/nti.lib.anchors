@@ -13,6 +13,7 @@
   },
   "author": "",
   "dependencies": {
+    "fbjs": "^0.2.1",
     "nti.lib.dom": "git+https://repos.nextthought.com/git/nti.lib.domjs",
     "nti.lib.interfaces": "git+https://repos.nextthought.com/git/nti.lib.interfaces"
   },

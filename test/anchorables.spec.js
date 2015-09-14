@@ -1,5 +1,5 @@
 /*global document, window*/
-import isEmpty from 'nti.lib.interfaces/utils/isempty';
+import isEmpty from 'fbjs/lib/isEmpty';
 
 import {getModel} from 'nti.lib.interfaces';
 
