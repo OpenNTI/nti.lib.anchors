@@ -1,6 +1,6 @@
 {
   "name": "nti.lib.anchorjs",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Content Anchor handling library",
   "private": true,
   "main": "index.js",
