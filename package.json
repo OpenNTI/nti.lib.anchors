@@ -29,6 +29,7 @@
     "jasmine-core": "^2.2.0",
     "karma": "^0.13.0",
     "karma-jasmine": "^0.3.1",
+    "karma-junit-reporter": "^0.3.8",
     "karma-mocha-reporter": "^1.0.2",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-script-launcher": "^0.1.0",
