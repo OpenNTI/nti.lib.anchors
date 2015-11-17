@@ -121,12 +121,14 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 	function cacheLocatorForDescription (desc, docElement2, cleanRoot2, containerId2, docElementContainerId2) {
 		let searchWithin, ancestorNode, virginNode;
 
-		if (!containerId2) {
+		if (!containerId2 && isDebug) {
 			console.warn('No container id provided will assume root without validating container');
 		}
 
 		if (!supportedContentRange(desc)) {
-			console.warn('nothing to parse?');
+			if (isDebug) {
+				console.warn('nothing to parse?');
+			}
 			return;
 		}
 
@@ -178,7 +180,9 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 	let ancestorNode, resultRange, searchWithin, locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
-		console.warn('nothing to parse?');
+		if (isDebug) {
+			console.warn('nothing to parse?');
+		}
 		return null;
 	}
 
@@ -186,7 +190,7 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 
 	try {
 
-		if (!containerId) {
+		if (!containerId && isDebug) {
 			console.log('No container id provided will use root without validating container ids');
 		}
 
@@ -296,7 +300,9 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 		docElement = (cleanRoot && cleanRoot.ownerDocument) || doc, locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
-		console.warn('nothing to parse?');
+		if (isDebug) {
+			console.warn('nothing to parse?');
+		}
 		return null;
 	}
 
@@ -304,7 +310,7 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 
 	try {
 
-		if (!containerId) {
+		if (!containerId && isDebug) {
 			console.log('No container id provided will use root without validating container ids');
 		}
 
@@ -421,7 +427,9 @@ function rootContainerIdFromDocument (doc) {
 /* tested */
 export function createRangeDescriptionFromRange (range, docElement) {
 	if (!range) {
-		console.log('Returning empty ContentRangeDescription for null range');
+		if (isDebug) {
+			console.log('Returning empty ContentRangeDescription for null range');
+		}
 		return {description: new ContentRangeDescription(null, null, {})};
 	}
 
@@ -515,7 +523,7 @@ function getContainerNode (containerId, root, defaultNode) {
 		isContainerNode = isContainerNode || DOM.matches(result, sel);
 	}
 
-	if (!isContainerNode) {
+	if (!isContainerNode && isDebug) {
 		console.warn('Found container we think is an invalid container node', result);
 	}
 
@@ -1204,7 +1212,9 @@ function getCurrentNodeMatches (pointer, treeWalker) {
 
 
 	if (pointer.nonEmptyContexts === undefined) {
-		console.error('nonEmptyContexts not set. This should only happen when testing');
+		if (isDebug) {
+			console.error('nonEmptyContexts not set. This should only happen when testing');
+		}
 		pointer.nonEmptyContexts = pointer.getContexts().filter((c, i) => {
 			//Always keep the primary.  It should never be empty, but just in case
 			if (i === 0) {
@@ -1941,7 +1951,9 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 			i++;
 		}
 
-		console.error('Can`t find offset in joined textNodes');
+		if (isDebug) {
+			console.error('Can`t find offset in joined textNodes');
+		}
 		return null;
 
 	}
@@ -1991,7 +2003,9 @@ export function cleanRangeFromBadStartAndEndContainers (range) {
 
 
 	if (isBlankTextNode(startContainer)) {
-		console.log('found a range with a starting node that is nothing but whitespace');
+		if (isDebug) {
+			console.log('found a range with a starting node that is nothing but whitespace');
+		}
 		let index = txtNodes.indexOf(startContainer);
 		for (let i = index; i < txtNodes.length; i++) {
 			if (!isBlankTextNode(txtNodes[i])) {
@@ -2002,7 +2016,9 @@ export function cleanRangeFromBadStartAndEndContainers (range) {
 	}
 
 	if (isBlankTextNode(endContainer)) {
-		console.log('found a range with a end node that is nothing but whitespace');
+		if (isDebug) {
+			console.log('found a range with a end node that is nothing but whitespace');
+		}
 		let index = txtNodes.indexOf(endContainer);
 		for (let i = index; i >= 0; i--) {
 			if (!isBlankTextNode(txtNodes[i])) {

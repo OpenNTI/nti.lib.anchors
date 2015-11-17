@@ -189,7 +189,7 @@ describe('Tests with Changing Documents', ()=> {
 			expect(getCurrentNodeMatches(end, afterEndWalker).length).toEqual(2);
 			expect(getCurrentNodeMatches(end, afterEndWalker)[0].confidence).toBeCloseTo(0.679);
 
-			console.log(getCurrentNodeMatches(end, afterEndWalker));
+			// console.log(getCurrentNodeMatches(end, afterEndWalker));
 
 			expect(getCurrentNodeMatches(end, afterEndWalker)[1].confidence).toBeCloseTo(0.476);
 
