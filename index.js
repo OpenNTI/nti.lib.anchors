@@ -1671,9 +1671,6 @@ export function purifyNode (docFrag) {
 		throw new Error('must pass a node to purify.');
 	}
 
-	let parentContainer,
-		nodeToInsertBefore;
-
 	//remove any action or counter spans and their children:
 	let remove = ['span.application-highlight.counter', 'span.redactionAction', 'span.blockRedactionAction'];
 
@@ -1686,36 +1683,21 @@ export function purifyNode (docFrag) {
 	//loop over elements we need to remove and, well, remove them:
 	for(let n of docFrag.querySelectorAll('[data-non-anchorable]')) {
 		if (n.parentNode) {
-			parentContainer = n.parentNode;
-			nodeToInsertBefore = n;
+			let parentContainer = n.parentNode;
+			let nodeToInsertBefore = n;
 			for(let c of n.childNodes) {
 				parentContainer.insertBefore(c, nodeToInsertBefore);
 			}
+
+			//remove non-anchorable node
+			parentContainer.removeChild(nodeToInsertBefore);
 		}
 		else {
 			throw new Error('Non-Anchorable node has no previous siblings or parent nodes.');
 		}
 
-		//remove non-anchorable node
-		parentContainer.removeChild(nodeToInsertBefore);
 	}
 
-	//IE9 and older
-	// function fallbackNormalize(node) {
-	// 	var i = 0, nc = node.childNodes;
-	// 	while (i < nc.length) {
-	// 		while (DOM.isTextNode(nc[i]) && i + 1 < nc.length && DOM.isTextNode(nc[i + 1])) {
-	// 			nc[i].data += nc[i + 1].data;
-	// 			node.removeChild(nc[i + 1]);
-	// 		}
-	// 		fallbackNormalize(nc[i]);
-	// 		i += 1;
-	// 	}
-	// }
-	//
-	// if (isIE9n) {
-	// 	fallbackNormalize(docFrag);
-	// }
 	docFrag.normalize();
 	return docFrag;
 }
