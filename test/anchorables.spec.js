@@ -50,8 +50,6 @@ import {
 	scopedContainerNode,
 	searchFromRangeEndInwardForAnchorableNode,
 	searchFromRangeStartInwardForAnchorableNode,
-	spanNoappendChild,
-	spanNosetAttribute,
 	tagNode,
 	toDomRange,
 	walkDownToLastNode
@@ -1613,11 +1611,11 @@ describe('Anchors', () => {
 			p.appendChild(t2);
 			p.setAttribute('shouldBeThere', 'true');
 			p.setAttribute('id', 'someRandomId');
-			spanNosetAttribute('data-non-anchorable', 'true');
+			spanNoAnchors.setAttribute('data-non-anchorable', 'true');
 			em.appendChild(t3);
-			spanNoappendChild(em);
+			spanNoAnchors.appendChild(em);
 			span.appendChild(t4);
-			spanNoappendChild(span);
+			spanNoAnchors.appendChild(span);
 			p.appendChild(spanNoAnchors);
 			testBody.appendChild(p);
 
@@ -1655,11 +1653,11 @@ describe('Anchors', () => {
 			p.setAttribute('data-non-anchorable', 'true');
 			p.appendChild(t1);
 			p.appendChild(t2);
-			spanNosetAttribute('data-non-anchorable', 'true');
+			spanNoAnchors.setAttribute('data-non-anchorable', 'true');
 			em.appendChild(t3);
-			spanNoappendChild(em);
+			spanNoAnchors.appendChild(em);
 			span.appendChild(t4);
-			spanNoappendChild(span);
+			spanNoAnchors.appendChild(span);
 			p.appendChild(spanNoAnchors);
 			div.setAttribute('id', 'validId');
 			div.appendChild(p);
@@ -1693,11 +1691,11 @@ describe('Anchors', () => {
 			p.setAttribute('data-non-anchorable', 'true');
 			p.appendChild(t1);
 			p.appendChild(t2);
-			spanNosetAttribute('data-non-anchorable', 'true');
+			spanNoAnchors.setAttribute('data-non-anchorable', 'true');
 			em.appendChild(t3);
-			spanNoappendChild(em);
+			spanNoAnchors.appendChild(em);
 			span.appendChild(t4);
-			spanNoappendChild(span);
+			spanNoAnchors.appendChild(span);
 			p.appendChild(spanNoAnchors);
 			div.setAttribute('id', 'validId');
 			div.appendChild(p);
