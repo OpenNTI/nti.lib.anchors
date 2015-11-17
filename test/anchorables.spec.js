@@ -133,6 +133,31 @@ describe('Anchors', () => {
 	});
 
 	describe('createRangeDescriptionFromRange Tests', () => {
+		it('A Better example of building DOM in a Spec: Create Description with non-anchorable', () => {
+			const id = 'ThisIdIsTheBest';
+			testBody.innerHTML = `
+			<div id="${id}">
+				<span id="12312312" data-non-anchorable=true>
+					<span class="a">text node 1<span>
+					<br/>
+					<span>text node 2</span>
+					<span class="b"></span>
+				</span>
+			</div>
+			`;
+
+			let p = testBody.querySelector('.a');
+			let a = testBody.querySelector('.b');
+
+			let range = document.createRange();
+			range.setStartBefore(p);
+			range.setEndAfter(a);
+
+			let result = createRangeDescriptionFromRange(range, document).description;
+
+			expect(result.getAncestor().getElementId()).toEqual(id);
+		});
+
 		it('Create Description with non-anchorable', () => {
 			let div = document.createElement('div'),
 				span = document.createElement('span'),
