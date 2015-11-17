@@ -1866,7 +1866,7 @@ describe('Anchors', () => {
 			addClass(elem, 'math');
 
 			child.appendChild(text);
-			elem.dom.appendChild(child);
+			elem.appendChild(child);
 
 			expect(isMathChild(text)).toBe(true);
 			expect(isMathChild(child)).toBe(true);
