@@ -1685,7 +1685,7 @@ export function purifyNode (docFrag) {
 		if (n.parentNode) {
 			let parentContainer = n.parentNode;
 			let nodeToInsertBefore = n;
-			for(let c of n.childNodes) {
+			for(let c of Array.from(n.childNodes)) {
 				parentContainer.insertBefore(c, nodeToInsertBefore);
 			}
 
