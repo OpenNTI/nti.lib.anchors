@@ -588,7 +588,7 @@ export function getContainerNtiid (node, def) {
 
 function doesElementMatchPointer (element, pointer) {
 	let id = element.id || (element.getAttribute ? element.getAttribute('id') : null);
-	let tag = element.tagName.toUpperCase();
+	let tag = (element.tagName || '').toUpperCase();
 
 	let pointerTag = pointer.elementTagName.toUpperCase();
 
