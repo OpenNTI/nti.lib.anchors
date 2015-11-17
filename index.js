@@ -1613,9 +1613,9 @@ export function purifyRange (range, doc) {
 		origEndModifiedOff = origEndEdgeNode.textContent.length;
 	}
 
-
+	const START_TAG_LENGTH = 33;
 	tagNode(origStartEdgeNode, 'start', origStartModifiedOff);
-	tagNode(origEndEdgeNode, 'end', (origStartEdgeNode === origEndEdgeNode) ? origEndModifiedOff + 33 : origEndModifiedOff);
+	tagNode(origEndEdgeNode, 'end', (origStartEdgeNode === origEndEdgeNode) ? origEndModifiedOff + START_TAG_LENGTH : origEndModifiedOff);
 
 	//setup our copy range
 	tempRange.selectNode(ancestor);
