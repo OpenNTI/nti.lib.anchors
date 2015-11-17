@@ -1,6 +1,7 @@
 /*global document, window*/
 import isEmpty from 'fbjs/lib/isEmpty';
 
+import {isTextNode} from 'nti.lib.dom';
 import {getModel} from 'nti.lib.interfaces';
 
 const RealDomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
@@ -21,7 +22,6 @@ class TextContext extends RealTextContext { constructor (o) { super(null, null, 
 
 import {
 	PURIFICATION_TAG,
-
 	cleanNode,
 	cleanRangeFromBadStartAndEndContainers,
 	containsFullContext,
@@ -37,7 +37,6 @@ import {
 	isMathChild,
 	isNodeAnchorable,
 	isNodeChildOfAncestor,
-	isTextNode,
 	lastWordFromString,
 	locateElementDomContentPointer,
 	locateRangeEdgeForAnchor,
