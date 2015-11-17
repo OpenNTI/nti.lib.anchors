@@ -1951,9 +1951,6 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 //TODO -testing
 //TODO - this can probably somehow be replaced with a purifiedNode call, rather than the logic that skips text nodes and subtracts offsets etc.
 function childrenIfSyntheticsRemoved (node) {
-	let sanitizedChildren = [], i,
-		children = node.childNodes,
-		child;
 
 	if (DOM.matches(node, 'span.application-highlight.counter') ||
 		DOM.matches(node, 'span.redactionAction') ||
@@ -1963,8 +1960,9 @@ function childrenIfSyntheticsRemoved (node) {
 		return [];
 	}
 
-	for (i = 0; i < children.length; i++) {
-		child = children[i];
+	let sanitizedChildren = [];
+	for (let child of Array.from(node.childNodes)) {
+
 		if (child.getAttribute && child.getAttribute('data-non-anchorable')) {
 			sanitizedChildren = sanitizedChildren.concat(childrenIfSyntheticsRemoved(child));
 		}
