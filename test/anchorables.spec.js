@@ -66,6 +66,7 @@ describe('Anchors', () => {
 
 	beforeEach(() => {
 		testBody = document.createElement('div');
+		testBody.classList.add('page-contents');
 		document.body.appendChild(testBody);
 	});
 

@@ -2029,7 +2029,7 @@ export function isMathChild (node) {
 
 
 function getImmutableBlockParent (node) {
-	let query = x => DOM.parent(node, `*:not(${x}) > ${x}`);
+	let query = x => DOM.parent(node, `.page-contents *:not(${x}) > ${x}`);
 
 	let immutables = ['.math', '[data-reactid]']
 		.map(query)
