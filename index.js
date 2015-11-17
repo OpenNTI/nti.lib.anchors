@@ -397,7 +397,8 @@ export function scopedContainerNode (fragOrNode, containerId, rootId) {
 }
 
 
-function rootContainerIdFromDocument (doc) {
+//Exported for tests
+export function rootContainerIdFromDocument (doc) {
 	if (!doc) {
 		return null;
 	}
@@ -538,8 +539,10 @@ function getContainerNode (containerId, root, defaultNode) {
  *  don't contain things in section-style sub containers.  Support on
  *  the ds is questionable and other parts of the app (carousel?) will
  *  need to be reworked
+ *
+ * Exported for tests
  */
-function getContainerNtiid (node, def) {
+export function getContainerNtiid (node, def) {
 	let n = node, ntiidAttr = 'data-ntiid', containerNode;
 
 	function ancestorOrSelfMatchingSelector (x, sel) {
@@ -980,7 +983,7 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 
 
 /* tested */
-function isNodeChildOfAncestor (node, ancestor) {
+export function isNodeChildOfAncestor (node, ancestor) {
 	while (node && node.parentNode) {
 		if (node.parentNode === ancestor) {
 			return true;
@@ -1144,7 +1147,8 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 }
 
 
-function getCurrentNodeMatches (pointer, treeWalker) {
+//Exported for tests
+export function getCurrentNodeMatches (pointer, treeWalker) {
 
 	let currentNode = treeWalker.currentNode,
 		lookingAtNode = currentNode,
@@ -1268,7 +1272,7 @@ function getCurrentNodeMatches (pointer, treeWalker) {
 }
 
 
-function containsFullContext (pointer) {
+export function containsFullContext (pointer) {
 	//Do we have a primary + 5 additional?
 
 	if (!pointer.getContexts()) {
@@ -1291,7 +1295,7 @@ function containsFullContext (pointer) {
 
 
 /* tested */
-function referenceNodeForNode (node, allowsUnsafeAnchors) {
+export function referenceNodeForNode (node, allowsUnsafeAnchors) {
 	if (!node) {
 		return null;
 	}
@@ -1304,7 +1308,7 @@ function referenceNodeForNode (node, allowsUnsafeAnchors) {
 
 
 /* tested */
-function makeRangeAnchorable (range, docElement) {
+export function makeRangeAnchorable (range, docElement) {
 	if (!range) {
 		throw new Error('Range cannot be null');
 	}
@@ -1372,8 +1376,8 @@ function makeRangeAnchorable (range, docElement) {
 //TODO for these two methods consider skipping over any nodes with 'data-no-anchorable-children'
 //as an optimization. (Probably minor since those are small parts of the tree right now)
 //TODO provide an end we don't go past
-/* tested */
-function searchFromRangeStartInwardForAnchorableNode (startNode, commonParent) {
+/* exported for tests */
+export function searchFromRangeStartInwardForAnchorableNode (startNode, commonParent) {
 	if (!startNode) {
 		return null;
 	}
@@ -1398,7 +1402,7 @@ function searchFromRangeStartInwardForAnchorableNode (startNode, commonParent) {
 
 /* tested */
 //TODO provide a node we don't go past
-function searchFromRangeEndInwardForAnchorableNode (endNode) {
+export function searchFromRangeEndInwardForAnchorableNode (endNode) {
 	//handle simple cases where we can immediatly return
 	if (!endNode) {
 		return null;
@@ -1436,7 +1440,7 @@ function searchFromRangeEndInwardForAnchorableNode (endNode) {
 
 
 /* tested */
-function walkDownToLastNode (node) {
+export function walkDownToLastNode (node) {
 	if (!node) {
 		throw new Error('Node cannot be null');
 	}
