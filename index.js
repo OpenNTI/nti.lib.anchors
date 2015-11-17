@@ -1847,7 +1847,7 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 			console.error('Expected a non text node.  Expect errors', container);
 		}
 
-		let kids = container.childNodes;
+		let kids = Array.from(container.childNodes);
 		let part = parseInt(parts.pop(), 10);
 
 		if (part >= kids.length) {
