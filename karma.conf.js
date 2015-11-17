@@ -28,12 +28,12 @@ module.exports = function (config) {
 
 		files: [
 			'test/**/*-shims.js',
-			'**/*.spec.js'
+			'test/**/*.spec.js'
 		],
 
 		preprocessors: {
 			'test/**/*-shims.js': ['webpack'],
-			'**/*.spec.js': ['webpack', 'sourcemap']
+			'test/**/*.spec.js': ['webpack', 'sourcemap']
 		},
 
 		exclude: [],
@@ -103,7 +103,7 @@ module.exports = function (config) {
 
 			module: {
 				loaders: [
-					{ test: /\.js(x)?$/, loader: 'babel' },
+					{ test: /\.js(x)?$/, loader: 'babel', exclude: /node_modules(\/(?!nti\.)[^\/]+)*$/ },
 					{ test: /\.json$/, loader: 'json' }
 				]
 			}
