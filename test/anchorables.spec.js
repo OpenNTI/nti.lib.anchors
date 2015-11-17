@@ -454,7 +454,7 @@ describe('Anchors', () => {
 			expect(nodeThatIsEdgeOfRange(range, true).tagName).toEqual('A');
 		});
 
-		xit('Range of Node and Nested Node, end', () => {
+		it('Range of Node and Nested Node, end', () => {
 			let range = document.createRange(),
 				nonTxtNode1 = document.createElement('div'),
 				nonTxtNode2 = document.createElement('a'),
@@ -468,7 +468,7 @@ describe('Anchors', () => {
 			range.setStart(nonTxtNode1, 0);
 			range.setEnd(nonTxtNode4, 0);
 
-			expect(nodeThatIsEdgeOfRange(range, false).tagName).toEqual('A');
+			expect(nodeThatIsEdgeOfRange(range, false).tagName).toEqual('P');
 		});
 
 		it('Range of Non Text Nodes, start', () => {
