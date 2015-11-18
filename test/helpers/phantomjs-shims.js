@@ -1,7 +1,6 @@
-require('babel/polyfill');
-//require('babel/polyfill');
-/*eslint no-var:0, no-extra-strict: 0*/
-(function() {
+/*eslint no-var:0, strict: 0*/
+require('babel-polyfill');
+(function () {
 	'use strict';
 	var Ap = Array.prototype;
 	var slice = Ap.slice;
@@ -10,11 +9,11 @@ require('babel/polyfill');
 	if (!Fp.bind) {
 		// PhantomJS doesn't support Function.prototype.bind natively, so
 		// polyfill it whenever this module is required.
-		Fp.bind = function(context) {
+		Fp.bind = function (context) {
 			var func = this;
 			var args = slice.call(arguments, 1);
 
-			function bound() {
+			function bound () {
 				var invokedAsConstructor = func.prototype && (this instanceof func);
 				return func.apply(
 					// Ignore the context parameter when invoking the bound function

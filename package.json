@@ -18,10 +18,13 @@
     "nti.lib.interfaces": "git+https://repos.nextthought.com/git/nti.lib.interfaces"
   },
   "devDependencies": {
-    "babel": "^5.0.0",
-    "babel-core": "^5.0.0",
-    "babel-eslint": "^4.0.0",
-    "babel-loader": "^5.0.0",
+    "babel-core": "^6.1.0",
+    "babel-eslint": "^4.1.0",
+    "babel-loader": "^6.2.0",
+    "babel-plugin-transform-runtime": "^6.1.0",
+    "babel-polyfill": "^6.1.0",
+    "babel-preset-es2015": "^6.1.0",
+    "babel-preset-stage-2": "^6.1.0",
     "eslint": "^1.0.0",
     "grunt": ">=0.4.5",
     "grunt-eslint": ">=12.0.0",
