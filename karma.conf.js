@@ -1,25 +1,7 @@
 /*eslint no-var: 0, strict: 0*/
 'use strict';
+var path = require('path');
 var webpack = require('webpack');
-
-var stat = {
-	version: false,
-	hash: false,
-	timings: false,
-	assets: false,
-	chunks: false,
-	chunkModules: false,
-	chunkOrigins: false,
-	modules: false,
-	cached: false,
-	cachedAssets: false,
-	showChildren: false,
-	source: false,
-
-	colors: true,
-	reasons: true,
-	errorDetails: true
-};
 
 module.exports = function (config) {
 	config.set({
@@ -53,16 +35,27 @@ module.exports = function (config) {
 		browsers: ['PhantomJS'],
 
 
-		//coverageReporter: { type: 'html', dir: 'reports/coverage/' },
+		coverageReporter: {
+			dir: 'reports/coverage/',
+			reporters: [
+				{ type: 'html', subdir: 'html' },
+				{ type: 'lcov', subdir: 'lcov' },
+				{ type: 'cobertura', subdir: '.', file: 'cobertura.txt' },
+				{ type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt' },
+				{ type: 'teamcity', subdir: '.', file: 'teamcity.txt' },
+				{ type: 'text', subdir: '.', file: 'text.txt' },
+				{ type: 'text-summary', subdir: '.', file: 'text-summary.txt' }
+			]
+		},
 
 		htmlReporter: {
-			//templatePath: __dirname+'/jasmine_template.html',
-			outputDir: 'reports'
+			outputDir: 'reports',
+			reportName: 'test-results'
 		},
 
 		junitReporter: {
-			outputDir: 'reports',
-			outputFile: 'test-results.xml',
+			outputDir: 'reports/test-results/',
+			outputFile: 'index.xml',
 			suite: 'nti.lib.anchorjs',
 			useBrowserName: false
 		},
@@ -75,17 +68,31 @@ module.exports = function (config) {
 
 
 		webpackServer: {
-			stats: stat,
-			quiet: true
+			noInfo: true,
+			stats: {
+				version: false,
+				hash: false,
+				timings: false,
+				assets: false,
+				chunks: false,
+				chunkModules: false,
+				chunkOrigins: false,
+				modules: false,
+				cached: false,
+				cachedAssets: false,
+				showChildren: false,
+				source: false,
+
+				colors: true,
+				reasons: true,
+				errorDetails: true
+			}
 		},
 
 		webpack: {
-			quiet: true,
 			cache: true,
 			debug: true,
 			devtool: 'inline-source-map',
-
-			stats: stat,
 
 			node: {
 				net: 'empty',
