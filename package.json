@@ -9,7 +9,7 @@
       "npm": ">=3.3.0"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test:continuous"
   },
   "repository": {
     "type": "git",
