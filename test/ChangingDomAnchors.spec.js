@@ -4,7 +4,7 @@ import {
 	getCurrentNodeMatches,
 	locateRangeEdgeForAnchor,
 	toDomRange
-} from '../index';
+} from '../src/index';
 
 describe('Tests with Changing Documents', ()=> {
 

@@ -1,25 +1,29 @@
 {
   "name": "nti.lib.anchorjs",
   "version": "1.1.0",
+  "author": "",
   "description": "Content Anchor handling library",
-  "private": true,
-  "main": "index.js",
+  "main": "lib/index.js",
+  "files": [
+      "lib"
+  ],
   "engines": {
-      "node": ">=5.0.0",
-      "npm": ">=3.3.0"
+    "node": ">=5.0.0",
+    "npm": ">=3.3.0"
   },
   "scripts": {
-    "test": "grunt test:continuous"
+    "test": "karma start --single-run --reporters dots,html,junit,coverage",
+    "start": "make check",
+    "build": "make"
   },
   "repository": {
     "type": "git",
     "url": "ssh://repos.nextthought.com/nti.lib.anchorjs"
   },
-  "author": "",
   "dependencies": {
     "fbjs": "^0.4.0",
-    "nti.lib.dom": "git+https://repos.nextthought.com/git/nti.lib.domjs",
-    "nti.lib.interfaces": "git+https://repos.nextthought.com/git/nti.lib.interfaces"
+    "nti.lib.dom": "^1.0.0",
+    "nti.lib.interfaces": "^1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.1.0",
@@ -30,9 +34,6 @@
     "babel-preset-es2015": "^6.1.0",
     "babel-preset-stage-2": "^6.1.0",
     "eslint": "^1.0.0",
-    "grunt": ">=0.4.5",
-    "grunt-eslint": ">=12.0.0",
-    "grunt-karma": "^0.12.0",
     "isparta-instrumenter-loader": "^1.0.0",
     "jasmine-core": "^2.2.0",
     "karma": "^0.13.0",
@@ -45,7 +46,6 @@
     "karma-script-launcher": "^0.1.0",
     "karma-sourcemap-loader": "^0.3.0",
     "karma-webpack": "^1.3.1",
-    "load-grunt-tasks": "^3.1.0",
     "phantomjs": "^1.9.18",
     "webpack": "^1.8.4",
     "webpack-dev-server": "^1.8.0"

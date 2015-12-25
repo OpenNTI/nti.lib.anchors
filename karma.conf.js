@@ -127,8 +127,7 @@ module.exports = function (config) {
 						test: /\.js$/,
 						loader: 'babel',
 						exclude:[
-							//exclude all node_modules EXCEPT our modules (they are still raw source)
-							/node_modules(\/(?!nti\.)[^\/]+)*$/
+							/node_modules/
 						]
 					}
 				]
