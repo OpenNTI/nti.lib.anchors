@@ -1,11 +1,11 @@
 {
   "name": "nti.lib.anchorjs",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "",
   "description": "Content Anchor handling library",
   "main": "lib/index.js",
   "files": [
-      "lib"
+    "lib"
   ],
   "engines": {
     "node": ">=5.0.0",
