@@ -12,9 +12,7 @@
     "npm": ">=3.3.0"
   },
   "scripts": {
-    "test": "karma start --single-run --reporters dots,html,junit,coverage",
-    "start": "make check",
-    "build": "make"
+    "test": "karma start --single-run --reporters dots,html,junit,coverage"
   },
   "repository": {
     "type": "git",
