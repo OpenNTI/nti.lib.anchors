@@ -1,7 +1,7 @@
 {
   "name": "nti.lib.anchorjs",
   "version": "1.2.0",
-  "author": "",
+  "author": "nextthought",
   "description": "Content Anchor handling library",
   "main": "lib/index.js",
   "files": [
