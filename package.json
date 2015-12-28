@@ -1,5 +1,5 @@
 {
-  "name": "nti.lib.anchorjs",
+  "name": "nti-lib-anchorjs",
   "version": "1.2.0",
   "author": "nextthought",
   "description": "Content Anchor handling library",
@@ -12,7 +12,9 @@
     "npm": ">=3.3.0"
   },
   "scripts": {
-    "test": "karma start --single-run --reporters dots,html,junit,coverage"
+    "test": "karma start --single-run --reporters dots,html,junit,coverage",
+    "start": "make check",
+    "prepublish": "karma start --single-run && make"
   },
   "repository": {
     "type": "git",
@@ -20,8 +22,8 @@
   },
   "dependencies": {
     "fbjs": "^0.4.0",
-    "nti.lib.dom": "^1.0.0",
-    "nti.lib.interfaces": "^1.0.0"
+    "nti-lib-dom": "^1.0.0",
+    "nti-lib-interfaces": "^1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.1.0",

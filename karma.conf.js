@@ -56,7 +56,7 @@ module.exports = function (config) {
 		junitReporter: {
 			outputDir: 'reports/test-results/',
 			outputFile: 'index.xml',
-			suite: 'nti.lib.anchorjs',
+			suite: 'nti-lib-anchorjs',
 			useBrowserName: false
 		},
 
