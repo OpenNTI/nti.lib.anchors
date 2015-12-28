@@ -1,6 +1,7 @@
 .PHONY:
 	clean \
-	check
+	check \
+	test
 
 
 #SRC = $(wildcard src/**/*.js)
@@ -17,6 +18,9 @@ node_modules: package.json
 
 check:
 	@eslint --ext .js,.jsx ./src
+
+test: node_modules check
+	@karma start --single-run
 
 clean:
 	@rm -rf $(LIBDIR)
