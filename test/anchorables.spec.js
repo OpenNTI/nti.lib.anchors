@@ -1,6 +1,4 @@
 /*global document, window*/
-import isEmpty from 'fbjs/lib/isEmpty';
-
 import {isTextNode} from 'nti-lib-dom';
 import {getModel} from 'nti-lib-interfaces';
 
@@ -12,6 +10,8 @@ const RealTextDomContentPointer = getModel('contentrange.textdomcontentpointer')
 
 const RealTextContext = getModel('contentrange.textcontext');
 
+
+const isEmpty = x => x == null || x.length === 0;
 
 
 class DomContentPointer extends RealDomContentPointer { constructor (o) { super(null, null, o); } }

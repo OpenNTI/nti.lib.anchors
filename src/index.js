@@ -1,9 +1,9 @@
 /*globals document, NodeFilter*/
 import * as DOM from 'nti-lib-dom';
 
-import isEmpty from 'fbjs/lib/isEmpty';
 
 import {getModel} from 'nti-lib-interfaces';
+const isEmpty = x => x == null || x.length === 0;
 
 const ContentRangeDescription = getModel('contentrange.contentrangedescription');
 const DomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
