@@ -1,8 +1,11 @@
 /*globals document, NodeFilter*/
 import * as DOM from 'nti-lib-dom';
-
-
 import {getModel} from 'nti-lib-interfaces';
+import Logger from 'nti-util-logger';
+
+const logger = Logger.get('lib:anchors');
+const tracelogger = Logger.get('lib:anchors:trace');
+
 const isEmpty = x => x == null || x.length === 0;
 
 const ContentRangeDescription = getModel('contentrange.contentrangedescription');
@@ -17,9 +20,6 @@ const CONTAINER_SELECTORS = [
 	'[type$=naquestion][data-ntiid]',
 	'[type$=ntivideo][data-ntiid]'
 ];
-
-//To control some logging
-const isDebug = false;
 
 export const PURIFICATION_TAG = 'data-nti-purification-tag';
 export const NON_ANCHORABLE_ATTRIBUTE = 'data-non-anchorable';
@@ -121,14 +121,12 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 	function cacheLocatorForDescription (desc, docElement2, cleanRoot2, containerId2, docElementContainerId2) {
 		let searchWithin, ancestorNode, virginNode;
 
-		if (!containerId2 && isDebug) {
-			console.warn('No container id provided will assume root without validating container');
+		if (!containerId2) {
+			tracelogger.warn('No container id provided will assume root without validating container');
 		}
 
 		if (!supportedContentRange(desc)) {
-			if (isDebug) {
-				console.warn('nothing to parse?');
-			}
+			tracelogger.warn('nothing to parse?');
 			return;
 		}
 
@@ -155,7 +153,7 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 			}
 		}
 		catch (e) {
-			console.error('Error resolving locator for desc', desc, e);
+			logger.error('Error resolving locator for desc', desc, e);
 		}
 	}
 
@@ -167,11 +165,11 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 			cacheLocatorForDescription(desc, docElement, cleanRoot, containerId, docElementContainerId);
 		}
 		catch (e) {
-			console.error('Unable to generate locator for desc', e);
+			logger.error('Unable to generate locator for desc', e);
 		}
 	});
 
-	console[locatorsFound === contentRangeDescriptions.length ?
+	logger[locatorsFound === contentRangeDescriptions.length ?
 			'log' : 'warn']('Preresolved ' + locatorsFound + '/' + contentRangeDescriptions.length + ' range descriptions');
 }
 
@@ -180,9 +178,7 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 	let ancestorNode, resultRange, searchWithin, locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
-		if (isDebug) {
-			console.warn('nothing to parse?');
-		}
+		tracelogger.warn('nothing to parse?');
 		return null;
 	}
 
@@ -190,8 +186,8 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 
 	try {
 
-		if (!containerId && isDebug) {
-			console.log('No container id provided will use root without validating container ids');
+		if (!containerId) {
+			tracelogger.log('No container id provided will use root without validating container ids');
 		}
 
 		//FIXME we run into potential problems with this is ContentRangeDescriptions ever occur in different documents
@@ -231,7 +227,7 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 		return resultRange;
 	}
 	catch (e) {
-		console.warn('Unable to generate range for description', e);
+		logger.warn('Unable to generate range for description', e);
 	}
 	return null;
 }
@@ -300,9 +296,7 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 		docElement = (cleanRoot && cleanRoot.ownerDocument) || doc, locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
-		if (isDebug) {
-			console.warn('nothing to parse?');
-		}
+		tracelogger.warn('nothing to parse?');
 		return null;
 	}
 
@@ -310,8 +304,8 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 
 	try {
 
-		if (!containerId && isDebug) {
-			console.log('No container id provided will use root without validating container ids');
+		if (!containerId) {
+			tracelogger.log('No container id provided will use root without validating container ids');
 		}
 
 		//FIXME we run into potential problems with this is ContentRangeDescriptions ever occur in different documents
@@ -350,7 +344,7 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 		return resultRange;
 	}
 	catch (e) {
-		console.warn('Unable to generate range for description', e);
+		tracelogger.warn('Unable to generate range for description', e);
 	}
 	return null;
 }
@@ -363,7 +357,7 @@ function createEmptyContentRangeDescription (docElement, containerId, rootId) {
 		throw new Error('Unable to find container ' + containerId + ' in provided docElement');
 	}
 
-	//console.debug('Given an empty content range description, returning a range wrapping the container', searchWithin);
+	//logger.debug('Given an empty content range description, returning a range wrapping the container', searchWithin);
 	resultRange = createRange(docElement);
 	resultRange.selectNode(searchWithin);
 	return resultRange;
@@ -373,7 +367,7 @@ function createEmptyContentRangeDescription (docElement, containerId, rootId) {
 function cachedLocatorEnsuringDocument (contentRangeDescription, document) {
 	let loc = contentRangeDescription.locator();
 	if (loc && loc.doc !== document) {
-		console.debug('Dumping locator because its from a different doc');
+		logger.debug('Dumping locator because its from a different doc');
 		contentRangeDescription.attachLocator(null);
 		loc = null;
 	}
@@ -410,7 +404,7 @@ export function rootContainerIdFromDocument (doc) {
 		metaNtiidTag = head.querySelectorAll('meta[name="NTIID"]');
 		if (metaNtiidTag && metaNtiidTag.length > 0) {
 			if (metaNtiidTag.length > 1) {
-				console.error('Encountered more than one NTIID meta tag. Using first, expect problems', metaNtiidTag);
+				logger.error('Encountered more than one NTIID meta tag. Using first, expect problems', metaNtiidTag);
 			}
 			metaNtiidTag = metaNtiidTag[0];
 		}
@@ -428,16 +422,14 @@ export function rootContainerIdFromDocument (doc) {
 /* tested */
 export function createRangeDescriptionFromRange (range, docElement) {
 	if (!range) {
-		if (isDebug) {
-			console.log('Returning empty ContentRangeDescription for null range');
-		}
+		tracelogger.log('Returning empty ContentRangeDescription for null range');
 		return {description: new ContentRangeDescription(null, null, {})};
 	}
 
 	cleanRangeFromBadStartAndEndContainers(range);
 	range = makeRangeAnchorable(range, docElement);
 	if (!range || range.collapsed) {
-		console.error('Anchorable range for provided range could not be found', range);
+		logger.error('Anchorable range for provided range could not be found', range);
 		throw new Error('Anchorable range for range could not be found');
 	}
 
@@ -446,7 +438,7 @@ export function createRangeDescriptionFromRange (range, docElement) {
 	let result = {};
 
 	if (!pureRange || pureRange.collapsed) {
-		console.error('Unable to purify anchorable range', range, pureRange);
+		logger.error('Unable to purify anchorable range', range, pureRange);
 		throw new Error('Unable to purify anchorable range for ContentRangeDescription generation');
 	}
 
@@ -472,7 +464,7 @@ export function createRangeDescriptionFromRange (range, docElement) {
 			ancestor: ancestorAnchor
 		});
 	} catch (e) {
-		console.warn('There was an error generating the description, hopefully the container will do.', e);
+		logger.warn('There was an error generating the description, hopefully the container will do.', e);
 	}
 	return result;
 }
@@ -515,7 +507,7 @@ function getContainerNode (containerId, root, defaultNode) {
 
 	if (potentials.length > 1) {
 		//TODO what do we actually do here?
-		console.warn('Found several matches for container. Will return first. Bad content?', containerId, potentials);
+		logger.warn('Found several matches for container. Will return first. Bad content?', containerId, potentials);
 	}
 
 	result = potentials[0];
@@ -524,8 +516,8 @@ function getContainerNode (containerId, root, defaultNode) {
 		isContainerNode = isContainerNode || DOM.matches(result, sel);
 	}
 
-	if (!isContainerNode && isDebug) {
-		console.warn('Found container we think is an invalid container node', result);
+	if (!isContainerNode) {
+		tracelogger.warn('Found container we think is an invalid container node', result);
 	}
 
 	return result;
@@ -619,7 +611,7 @@ function createPointer (range, role, node) {
 		});
 	}
 
-	console.error('Not sure what to do with this node', node, role);
+	logger.error('Not sure what to do with this node', node, role);
 	throw new Error('Unable to translate node to pointer');
 }
 
@@ -775,7 +767,7 @@ export function generatePrimaryContext (range, role) {
 		contextOffset = textContent.length - contextOffset;
 	}
 
-	//console.log('Created Context, TEXT', "'"+textContent+"'", 'CONTEXT', contextText, 'OFFSET', contextOffset);
+	//logger.log('Created Context, TEXT', "'"+textContent+"'", 'CONTEXT', contextText, 'OFFSET', contextOffset);
 
 	return new TextContext(null, null, {
 		contextText: contextText,
@@ -819,7 +811,7 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 
 	loc = cachedLocatorEnsuringDocument(rangeDesc, docElement);
 	if (loc) {
-		//console.debug('Using cached locator info');
+		//logger.debug('Using cached locator info');
 		return loc;
 	}
 
@@ -827,56 +819,48 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 	if (!startResult.node ||
 		!startResult.hasOwnProperty('confidence') ||
 		startResult.confidence === 0) {
-		if (isDebug) {
-			console.warn('No possible start found for', rangeDesc, startResult);
-		}
+		tracelogger.warn('No possible start found for', rangeDesc, startResult);
 		return null;
 	}
 
 	if (startResult.confidence < confidenceCutoff) {
-		if (isDebug) {
-			console.warn('No start found with an acceptable confidence.', startResult, rangeDesc);
-		}
+		tracelogger.warn('No start found with an acceptable confidence.', startResult, rangeDesc);
 		return null;
 	}
 
 	if (startResult.confidence < 1.0) {
-		if (isDebug) {
-			console.log('Matched start with confidence of', startResult.confidence, startResult, rangeDesc);
-		}
+		tracelogger.log('Matched start with confidence of', startResult.confidence, startResult, rangeDesc);
 	}
 	else {
-		if (isDebug) {
-			console.log('Found an exact match for start', startResult, rangeDesc);
-		}
+		tracelogger.log('Found an exact match for start', startResult, rangeDesc);
 	}
 
 	endResult = locateRangePointInAncestor(rangeDesc.getEnd(), ancestor, startResult);
 	if (!endResult.node ||
 		!endResult.hasOwnProperty('confidence') ||
 		endResult.confidence === 0) {
-		if (isDebug) {
-			console.warn('No possible end found for', rangeDesc, endResult);
-		}
+
+		tracelogger.warn('No possible end found for', rangeDesc, endResult);
+
 		return null;
 	}
 
 	if (endResult.confidence < confidenceCutoff) {
-		if (isDebug) {
-			console.warn('No end found with an acceptable confidence.', endResult, rangeDesc);
-		}
+
+		tracelogger.warn('No end found with an acceptable confidence.', endResult, rangeDesc);
+
 		return null;
 	}
 
 	if (endResult.confidence < 1.0) {
-		if (isDebug) {
-			console.log('Matched end with confidence of', endResult.confidence, endResult, rangeDesc);
-		}
+
+		tracelogger.log('Matched end with confidence of', endResult.confidence, endResult, rangeDesc);
+
 	}
 	else {
-		if (isDebug) {
-			console.log('Found an exact match for end', endResult, rangeDesc);
-		}
+
+		tracelogger.log('Found an exact match for end', endResult, rangeDesc);
+
 	}
 
 	startResultLocator = toReferenceNodeXpathAndOffset(startResult);
@@ -908,7 +892,7 @@ function convertContentRangeToDomRange (startResult, endResult, docElement) {
 		liveEndResult = convertStaticResultToLiveDomContainerAndOffset(endResult, docElement),
 		range;
 
-	//		console.log('liveStartResult', liveStartResult, 'liveEndResult', liveEndResult);
+	//		logger.log('liveStartResult', liveStartResult, 'liveEndResult', liveEndResult);
 	if (!liveStartResult || !liveEndResult) {
 		return null;
 	}
@@ -950,7 +934,7 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 	if (theId.indexOf('tag:nextthought.com') === 0) {
 		parts = theId.split(',');
 		if (parts.length < 2) {
-			console.warn('Encountered an ntiid looking id that doesn\'t split by comma');
+			logger.warn('Encountered an ntiid looking id that doesn\'t split by comma');
 		}
 		else {
 			//Note this may not technically be an exact match, but the potentials loop below should weed out any issues
@@ -968,8 +952,8 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 			if (doesElementMatchPointer(p, pointer)) {
 				r = {confidence: 1, node: p};
 			}
-			else if (isDebug) {
-				console.warn('Potential match doesn\'t match pointer', p, pointer);
+			else {
+				tracelogger.warn('Potential match doesn\'t match pointer', p, pointer);
 			}
 
 			if (r) {
@@ -1064,7 +1048,7 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 			//Always keep the primary.  It should never be empty, but just in case
 			if (ix === 0) {
 				if (isEmpty(c.contextText.trim())) {
-					console.error('Found a primary context with empty contextText.  Where did that come from?', pointer);
+					logger.error('Found a primary context with empty contextText.  Where did that come from?', pointer);
 				}
 				return true;
 			}
@@ -1118,9 +1102,9 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 			//to non stable ids that have changed we end up never partial matching.
 			//Instead of doing that maybe instead of not trying to partial match we just take a
 			//deduciton from the overal confidence.
-			if (isDebug) {
-				console.info('Ignoring fuzzy matching because we could not resolve the pointers ancestor', pointer, possibleNodes, ancestorNode);
-			}
+
+			tracelogger.info('Ignoring fuzzy matching because we could not resolve the pointers ancestor', pointer, possibleNodes, ancestorNode);
+
 			return {confidence: 0};
 		}
 
@@ -1133,9 +1117,9 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 		if (result === null) {
 			result = {confidence: 0};
 		}
-		if (isDebug) {
-			console.log('Searching for best ' + pointer.getRole() + ' match in ', possibleNodes);
-		}
+
+		tracelogger.log('Searching for best ' + pointer.getRole() + ' match in ', possibleNodes);
+
 		for (i = 0; i < possibleNodes.length; i++) {
 			if (possibleNodes[i].confidence > result.confidence) {
 				result = possibleNodes[i];
@@ -1216,14 +1200,14 @@ export function getCurrentNodeMatches (pointer, treeWalker) {
 
 
 	if (pointer.nonEmptyContexts === undefined) {
-		if (isDebug) {
-			console.error('nonEmptyContexts not set. This should only happen when testing');
-		}
+
+		tracelogger.error('nonEmptyContexts not set. This should only happen when testing');
+
 		pointer.nonEmptyContexts = pointer.getContexts().filter((c, i) => {
 			//Always keep the primary.  It should never be empty, but just in case
 			if (i === 0) {
 				if (isEmpty(c.contextText.trim())) {
-					console.error('Found a primary context with empty contextText.  Where did that come from?', pointer);
+					logger.error('Found a primary context with empty contextText.  Where did that come from?', pointer);
 				}
 				return true;
 			}
@@ -1764,7 +1748,7 @@ export function findTaggedNode (root, tag) {
 
 		}
 		else if (!temp || temp.nodeType !== 11) {
-			console.warn('skipping node while looking for tag', temp);
+			logger.warn('skipping node while looking for tag', temp);
 		}
 
 		//advance:
@@ -1844,14 +1828,14 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 	while (parts.length > 1) {
 
 		if (DOM.isTextNode(container)) {
-			console.error('Expected a non text node.  Expect errors', container);
+			logger.error('Expected a non text node.  Expect errors', container);
 		}
 
 		let kids = Array.from(container.childNodes);
 		let part = parseInt(parts.pop(), 10);
 
 		if (part >= kids.length) {
-			console.error('Invalid xpath ' + staticResult.xpath + ' from node', referenceNode);
+			logger.error('Invalid xpath ' + staticResult.xpath + ' from node', referenceNode);
 			return null;
 		}
 
@@ -1916,7 +1900,7 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 		//If the container isn't a text node, the offset is the ith child
 		if (!DOM.isTextNode(child)) {
 			result = {container: ithChildAccountingForSyntheticNodes(child, offset, null)};
-			//console.log('Returning result from child is not textnode branch', result);
+			//logger.log('Returning result from child is not textnode branch', result);
 			return result;
 		}
 
@@ -1937,9 +1921,9 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 			i++;
 		}
 
-		if (isDebug) {
-			console.error('Can`t find offset in joined textNodes');
-		}
+
+		tracelogger.error('Can`t find offset in joined textNodes');
+
 		return null;
 
 	}
@@ -1956,7 +1940,7 @@ function childrenIfSyntheticsRemoved (node) {
 		DOM.matches(node, 'span.redactionAction') ||
 		DOM.matches(node, 'span.blockRedactionAction')) {
 		//ignore children:
-		//console.log('ignoring children of', node, 'when finding non synthetic kids');
+		//logger.log('ignoring children of', node, 'when finding non synthetic kids');
 		return [];
 	}
 
@@ -1987,9 +1971,9 @@ export function cleanRangeFromBadStartAndEndContainers (range) {
 
 
 	if (isBlankTextNode(startContainer)) {
-		if (isDebug) {
-			console.log('found a range with a starting node that is nothing but whitespace');
-		}
+
+		tracelogger.log('found a range with a starting node that is nothing but whitespace');
+
 		let index = txtNodes.indexOf(startContainer);
 		for (let i = index; i < txtNodes.length; i++) {
 			if (!isBlankTextNode(txtNodes[i])) {
@@ -2000,9 +1984,9 @@ export function cleanRangeFromBadStartAndEndContainers (range) {
 	}
 
 	if (isBlankTextNode(endContainer)) {
-		if (isDebug) {
-			console.log('found a range with a end node that is nothing but whitespace');
-		}
+
+		tracelogger.log('found a range with a end node that is nothing but whitespace');
+
 		let index = txtNodes.indexOf(endContainer);
 		for (let i = index; i >= 0; i--) {
 			if (!isBlankTextNode(txtNodes[i])) {

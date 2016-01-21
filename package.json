@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "nti-lib-dom": "^1.0.0",
-    "nti-lib-interfaces": "^1.0.0"
+    "nti-lib-interfaces": "^1.0.0",
+    "nti-util-logger": "^1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.1.0",
