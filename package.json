@@ -22,6 +22,7 @@
     "url": "ssh://repos.nextthought.com/nti.lib.anchorjs"
   },
   "dependencies": {
+    "babel-runtime": "^6.5.0",
     "nti-lib-dom": "^1.0.0",
     "nti-lib-interfaces": "^1.0.0",
     "nti-util-logger": "^1.0.0"
