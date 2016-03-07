@@ -134,8 +134,12 @@ describe('Anchors', () => {
 	});
 
 	describe('createRangeDescriptionFromRange Tests', () => {
+		it ('Dummy Test', () => {
+			document.body.removeChild(testBody);
+			document.body.appendChild(testBody);
+		});
 
-		it('A Better example of building DOM in a Spec: Create Description with non-anchorable', () => {
+		it('Create Description with non-anchorable', () => {
 			const id = 'ThisIdIsTheBestest';
 			const div = document.createElement('div');
 
@@ -175,36 +179,36 @@ describe('Anchors', () => {
 			expect(result.getAncestor().getElementId()).toEqual(id);
 		});
 
-		it('Create Description with non-anchorable', () => {
-			let div = document.createElement('div'),
-				span = document.createElement('span'),
-				p = document.createElement('p'),
-				t1 = document.createTextNode('text node 1'),
-				span2 = document.createElement('span'),
-				p2 = document.createElement('p'),
-				t2 = document.createTextNode('text node 2'),
-				a = document.createElement('div'),
-				range, result;
-
-			p2.appendChild(t2);
-			span2.appendChild(p2);
-			p.appendChild(t1);
-			span.appendChild(p);
-			span.appendChild(span2);
-			span.appendChild(a);
-			span.setAttribute('id', '12312312');
-			span.setAttribute('data-non-anchorable', 'true');
-			div.setAttribute('id', 'ThisIdIsTheBest');
-			div.appendChild(span);
-			testBody.appendChild(div);
-			document.body.appendChild(testBody);
-			range = document.createRange();
-			range.setStartBefore(p);
-			range.setEndAfter(a);
-
-			result = createRangeDescriptionFromRange(range, document).description;
-			expect(result.getAncestor().getElementId()).toEqual(div.getAttribute('id'));
-		});
+		// it('Create Description with non-anchorable', () => {
+		// 	let div = document.createElement('div'),
+		// 		span = document.createElement('span'),
+		// 		p = document.createElement('p'),
+		// 		t1 = document.createTextNode('text node 1'),
+		// 		span2 = document.createElement('span'),
+		// 		p2 = document.createElement('p'),
+		// 		t2 = document.createTextNode('text node 2'),
+		// 		a = document.createElement('div'),
+		// 		range, result;
+		//
+		// 	p2.appendChild(t2);
+		// 	span2.appendChild(p2);
+		// 	p.appendChild(t1);
+		// 	span.appendChild(p);
+		// 	span.appendChild(span2);
+		// 	span.appendChild(a);
+		// 	span.setAttribute('id', '12312312');
+		// 	span.setAttribute('data-non-anchorable', 'true');
+		// 	div.setAttribute('id', 'ThisIdIsTheBest');
+		// 	div.appendChild(span);
+		// 	testBody.appendChild(div);
+		// 	document.body.appendChild(testBody);
+		// 	range = document.createRange();
+		// 	range.setStartBefore(p);
+		// 	range.setEndAfter(a);
+		//
+		// 	result = createRangeDescriptionFromRange(range, document).description;
+		// 	expect(result.getAncestor().getElementId()).toEqual(div.getAttribute('id'));
+		// });
 
 		it('Create Desciption from range of image with id', () => {
 			let img = document.createElement('img'),
