@@ -134,7 +134,7 @@ describe('Anchors', () => {
 	});
 
 	describe('createRangeDescriptionFromRange Tests', () => {
-
+		/*
 		it('A Better example of building DOM in a Spec: Create Description with non-anchorable', () => {
 			const id = 'ThisIdIsTheBestest';
 			const div = document.createElement('div');
@@ -173,6 +173,7 @@ describe('Anchors', () => {
 
 			expect(result.getAncestor().getElementId()).toEqual(id);
 		});
+		*/
 
 		it('Create Description with non-anchorable', () => {
 			let div = document.createElement('div'),
