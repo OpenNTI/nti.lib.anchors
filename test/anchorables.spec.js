@@ -2,6 +2,10 @@
 import {isTextNode} from 'nti-lib-dom';
 import {getModel} from 'nti-lib-interfaces';
 
+if (typeof localStorage !== 'undefined') {
+	localStorage.setItem('debug', '*');
+}
+
 const RealDomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
 
 const RealDomContentPointer = getModel('contentrange.domcontentpointer');
@@ -134,12 +138,9 @@ describe('Anchors', () => {
 	});
 
 	describe('createRangeDescriptionFromRange Tests', () => {
-		it ('Dummy Test', () => {
-			document.body.removeChild(testBody);
-			document.body.appendChild(testBody);
-		});
 
-		it('Create Description with non-anchorable', () => {
+
+		it('Create Description with non-anchorable', (done) => {
 			const id = 'ThisIdIsTheBestest';
 			const div = document.createElement('div');
 
@@ -158,25 +159,37 @@ describe('Anchors', () => {
 			testBody.appendChild(div);
 			document.body.appendChild(testBody);
 
-			// function validate () {
-			const a = document.querySelector('.a');
-			const b = document.querySelector('.b');
-			expect(a).toBeTruthy();
-			expect(b).toBeTruthy();
+			function validate () {
+				const a = document.querySelector('.a');
+				const b = document.querySelector('.b');
+				expect(a).toBeTruthy();
+				expect(b).toBeTruthy();
 
-			let range = document.createRange();
-			range.setStartBefore(a);
-			range.setEndAfter(b);
+				let range = document.createRange();
+				range.setStartBefore(a);
+				range.setEndAfter(b);
 
-			expect(range.collapsed).toBeFalsy();
-			expect(range.startOffset).toBe(1);
-			expect(range.endOffset).toBe(6);
+				expect(range.collapsed).toBeFalsy();
+				expect(range.startOffset).toBe(1);
+				expect(range.endOffset).toBe(6);
 
-			const {description: result} = createRangeDescriptionFromRange(range, document);
+				const {description: result} = createRangeDescriptionFromRange(range, document);
 
-			expect(result).toBeTruthy();
+				expect(result).toBeTruthy();
 
-			expect(result.getAncestor().getElementId()).toEqual(id);
+				expect(result.getAncestor().getElementId()).toEqual(id);
+				done();
+			}
+
+			function check () {
+				if (!document.querySelector(`#${id} .b`)) {
+					return setTimeout(check, 100);
+				}
+
+				validate();
+			}
+
+			setTimeout(check, 100);
 		});
 
 		// it('Create Description with non-anchorable', () => {
