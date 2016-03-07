@@ -134,42 +134,44 @@ describe('Anchors', () => {
 	});
 
 	describe('createRangeDescriptionFromRange Tests', () => {
-		it('A Better example of building DOM in a Spec: Create Description with non-anchorable', (done) => {
-			const id = 'ThisIdIsTheBest';
-			testBody.innerHTML = `
-			<div id="${id}">
-				<span id="12312312" data-non-anchorable=true>
+
+		it('A Better example of building DOM in a Spec: Create Description with non-anchorable', () => {
+			const id = 'ThisIdIsTheBestest';
+			const div = document.createElement('div');
+
+			div.setAttribute('id', id);
+			div.innerHTML = `
+				<span id="a12312312" data-non-anchorable=true>
 					<span class="a">text node 1<span>
 					<br/>
 					<span>text node 2</span>
 					<span class="b"></span>
 				</span>
-			</div>
 			`;
 
-			function validate () {
-				let p = testBody.querySelector('.a');
-				let a = testBody.querySelector('.b');
+			expect(div.children.length).toBe(1);
 
-				let range = document.createRange();
-				range.setStartBefore(p);
-				range.setEndAfter(a);
+			testBody.appendChild(div);
 
-				let result = createRangeDescriptionFromRange(range, document).description;
+			// function validate () {
+			const a = document.querySelector('.a');
+			const b = document.querySelector('.b');
+			expect(a).toBeTruthy();
+			expect(b).toBeTruthy();
 
-				expect(result.getAncestor().getElementId()).toEqual(id);
-				done();
-			}
+			let range = document.createRange();
+			range.setStartBefore(a);
+			range.setEndAfter(b);
 
-			function check () {
-				if (document.body.innerHTML.indexOf(id) < 0) {
-					return setTimeout(check, 10);
-				}
+			expect(range.collapsed).toBeFalsy();
+			expect(range.startOffset).toBe(1);
+			expect(range.endOffset).toBe(6);
 
-				validate();
-			}
+			const {description: result} = createRangeDescriptionFromRange(range, document);
 
-			setTimeout(check, 10);
+			expect(result).toBeTruthy();
+
+			expect(result.getAncestor().getElementId()).toEqual(id);
 		});
 
 		it('Create Description with non-anchorable', () => {
