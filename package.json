@@ -15,7 +15,7 @@
   "scripts": {
     "test": "karma start --single-run --reporters dots,html,junit,coverage",
     "start": "make check",
-    "prepublish": "make"
+    "prepublish": "not-in-install && make || in-install"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "babel-preset-es2015": "^6.1.0",
     "babel-preset-stage-2": "^6.1.0",
     "eslint": "^2.2.0",
+    "in-publish": "^2.0.0",
     "isparta-instrumenter-loader": "^1.0.0",
     "jasmine-core": "^2.2.0",
     "json-loader": "^0.5.4",
