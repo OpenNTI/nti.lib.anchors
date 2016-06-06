@@ -57,7 +57,7 @@ import {
 	toDomRange,
 	walkDownToLastNode
 
-} from '../src/index';
+} from '../index';
 
 
 function addClass (element, cls) {
