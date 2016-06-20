@@ -28,7 +28,7 @@
     "nti-util-logger": "^1.0.0"
   },
   "devDependencies": {
-    "babel-core": "^6.1.0",
+    "babel-cli": "^6.1.0",
     "babel-eslint": "^6.0.0",
     "babel-plugin-transform-runtime": "^6.1.0",
     "babel-polyfill": "^6.1.0",
