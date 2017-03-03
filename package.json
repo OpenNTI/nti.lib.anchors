@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://repos.nextthought.com/git/nti.lib.anchorjs"
+    "url": "https://github.com/NextThought/nti.lib.anchorjs.git"
   },
   "dependencies": {
     "babel-runtime": "^6.5.0",
