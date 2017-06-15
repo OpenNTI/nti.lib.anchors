@@ -1,4 +1,5 @@
-/*global document, window*/
+/*global document, window, localStorage*/
+/* eslint-env jest */
 import {isTextNode} from 'nti-lib-dom';
 import {getModel} from 'nti-lib-interfaces';
 

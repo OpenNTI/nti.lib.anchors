@@ -1,4 +1,5 @@
 /*globals document, NodeFilter */
+/* eslint-env jest */
 import {
 	createRangeDescriptionFromRange,
 	getCurrentNodeMatches,

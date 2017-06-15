@@ -1,4 +1,4 @@
-/*eslint no-var:0, strict: 0*/
+/*eslint-disable no-var, strict, import/no-commonjs, import/no-extraneous-dependencies*/
 require('babel-polyfill');
 (function () {
 	'use strict';
