@@ -15,7 +15,7 @@
   "scripts": {
     "test": "karma start --single-run --reporters dots,html,junit,coverage",
     "start": "make check",
-    "prepublish": "not-in-install && make || in-install"
+    "prepack": "make test && make"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,6 @@
     "babel-preset-es2015": "^6.1.0",
     "babel-preset-stage-2": "^6.1.0",
     "eslint-config-nti-codestyle-js": "^1.1.0",
-    "in-publish": "^2.0.0",
     "nti-unittesting-clientside": "^1.0.3"
   }
 }
