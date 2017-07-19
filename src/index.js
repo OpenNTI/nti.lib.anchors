@@ -47,8 +47,8 @@ const IGNORE_WHITESPACE_TEXTNODE_FILTER = {
 
 function escapeId (id) {
 	return id.replace(/:/g, '\\3a ') //no colons
-			.replace(/,/g, '\\2c ')//no commas
-			.replace(/\./g, '\\2e ');//no periods
+		.replace(/,/g, '\\2c ')//no commas
+		.replace(/\./g, '\\2e ');//no periods
 }
 
 function getWhitespaceFilter () {
@@ -170,7 +170,7 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 	});
 
 	logger[locatorsFound === contentRangeDescriptions.length ?
-			'log' : 'warn']('Preresolved ' + locatorsFound + '/' + contentRangeDescriptions.length + ' range descriptions');
+		'log' : 'warn']('Preresolved ' + locatorsFound + '/' + contentRangeDescriptions.length + ' range descriptions');
 }
 
 
