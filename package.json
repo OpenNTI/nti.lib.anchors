@@ -15,7 +15,8 @@
   "scripts": {
     "test": "karma start --single-run --reporters dots,html,junit,coverage",
     "start": "make check",
-    "prepack": "make check && npm test && make"
+    "prepack": "make check && npm test && make",
+    "release": "./release.sh"
   },
   "repository": {
     "type": "git",
