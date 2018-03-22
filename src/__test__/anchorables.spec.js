@@ -3,10 +3,6 @@
 import {isTextNode} from 'nti-lib-dom';
 import {getModel} from 'nti-lib-interfaces';
 
-if (typeof localStorage !== 'undefined') {
-	localStorage.setItem('debug', '*');
-}
-
 const RealDomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
 
 const RealDomContentPointer = getModel('contentrange.domcontentpointer');

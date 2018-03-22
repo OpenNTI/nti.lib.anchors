@@ -1,9 +1,9 @@
 {
-	"extends": [
-		"nti-codestyle-js"
-	],
+	"extends": "./node_modules/@nti/codestyle-js/index.js",
 	"parser": "babel-eslint",
 	"rules": {
+		"import/no-commonjs": 0,
+		"import/no-extraneous-dependencies": 0,
 		"no-restricted-globals": 0
 	}
 }
