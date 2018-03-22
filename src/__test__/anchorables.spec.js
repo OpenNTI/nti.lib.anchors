@@ -3,6 +3,8 @@
 import {isTextNode} from 'nti-lib-dom';
 import {getModel} from 'nti-lib-interfaces';
 
+const wait = x => new Promise(t => setTimeout(t, x));
+
 const RealDomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
 
 const RealDomContentPointer = getModel('contentrange.domcontentpointer');
@@ -69,11 +71,18 @@ describe('Anchors', () => {
 		testBody = document.createElement('div');
 		testBody.classList.add('page-contents');
 		document.body.appendChild(testBody);
+		return wait(1);
 	});
 
 	afterEach(() => document.body.removeChild(testBody));
 
 	describe('rootContainerIdFromDocument Tests', () => {
+		beforeEach(() => {
+			for(let h of Array.from(document.querySelectorAll('head > meta'))) {
+				h.remove();
+			}
+		});
+
 		it('Looks in meta tags', () => {
 			let head, meta;
 			expect(rootContainerIdFromDocument(document)).toBeFalsy();
@@ -2387,6 +2396,12 @@ describe('Anchors', () => {
 	});
 
 	describe('scopeContainerId', () => {
+		beforeEach(() => {
+			for(let h of Array.from(document.querySelectorAll('head > meta'))) {
+				h.remove();
+			}
+		});
+
 		it('searches within the body when rootId and containerId are equal.', () => {
 			let mainNode = document.createElement('div'),
 				pageContent = document.createElement('div'),
@@ -2430,7 +2445,16 @@ describe('Anchors', () => {
 		it('searches within the fragment node when the containerId is not provided', () => {
 			let mainNode = document.createElement('div'),
 				pageContent = document.createElement('div'),
-				rootId, searchWithin;
+				rootId, searchWithin, head, meta,
+				containerId = 'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.4';
+
+			//Setup the page ntiid meta tag.
+			expect(rootContainerIdFromDocument(document)).toBeFalsy();
+			head = document.getElementsByTagName('head')[0];
+			meta = document.createElement('meta');
+			meta.setAttribute('name', 'NTIID');
+			meta.setAttribute('content', containerId);
+			head.appendChild(meta);
 
 			//We expect the rootId to valid because the ntiid
 			expect(rootContainerIdFromDocument(document)).toBeTruthy();

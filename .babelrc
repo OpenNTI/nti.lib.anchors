@@ -1,7 +1,15 @@
 {
 	"presets": [
-		"es2015",
-		"stage-2"
+		["env", {
+			"useBuiltIns": true,
+			"targets": {
+				"browsers": [
+					"> 1% in US",
+					"last 2 versions",
+					"safari >= 6"
+				]
+			}
+		}]
 	],
 	"compact": false,
 	"sourceMaps": "both"

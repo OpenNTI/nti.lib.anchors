@@ -28,13 +28,11 @@
     "nti-util-logger": "^1.0.0"
   },
   "devDependencies": {
+    "@nti/codestyle-js": "^1.1.0",
     "babel-cli": "^6.1.0",
     "babel-eslint": "^8.2.2",
-    "babel-plugin-transform-runtime": "^6.1.0",
     "babel-polyfill": "^6.1.0",
-    "babel-preset-es2015": "^6.1.0",
-    "babel-preset-stage-2": "^6.1.0",
-    "@nti/codestyle-js": "^1.1.0",
+    "babel-preset-env": "^1.1.4",
     "nti-unittesting-clientside": "^2.0.0"
   }
 }
