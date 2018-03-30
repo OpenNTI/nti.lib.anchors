@@ -1,6 +1,6 @@
 {
   "name": "nti-lib-anchorjs",
-  "version": "1.4.0",
+  "version": "1.5.0-alpha",
   "author": "nextthought",
   "license": "UNLICENSED",
   "description": "Content Anchor handling library",
