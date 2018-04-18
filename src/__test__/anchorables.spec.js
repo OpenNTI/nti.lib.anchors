@@ -1,7 +1,7 @@
 /*global document, window, localStorage*/
 /* eslint-env jest */
-import {isTextNode} from 'nti-lib-dom';
-import {getModel} from 'nti-lib-interfaces';
+import {isTextNode} from '@nti/lib-dom';
+import {getModel} from '@nti/lib-interfaces';
 
 const wait = x => new Promise(t => setTimeout(t, x));
 

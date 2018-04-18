@@ -1,7 +1,7 @@
 /*globals document, NodeFilter*/
-import * as DOM from 'nti-lib-dom';
-import {getModel} from 'nti-lib-interfaces';
-import Logger from 'nti-util-logger';
+import * as DOM from '@nti/lib-dom';
+import {getModel} from '@nti/lib-interfaces';
+import Logger from '@nti/util-logger';
 
 const logger = Logger.get('lib:anchors');
 const tracelogger = Logger.get('lib:anchors:trace');

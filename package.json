@@ -1,5 +1,5 @@
 {
-  "name": "nti-lib-anchorjs",
+  "name": "@nti/lib-anchors",
   "version": "1.5.0-alpha",
   "author": "nextthought",
   "license": "UNLICENSED",
@@ -20,19 +20,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NextThought/nti.lib.anchorjs.git"
+    "url": "https://github.com/NextThought/nti.lib.anchors.git"
   },
   "dependencies": {
-    "nti-lib-dom": "^1.0.0",
-    "nti-lib-interfaces": "^1.0.0",
-    "nti-util-logger": "^1.0.0"
+    "@nti/lib-dom": "^1.0.0",
+    "@nti/lib-interfaces": "^1.0.0",
+    "@nti/util-logger": "^1.0.0"
   },
   "devDependencies": {
     "@nti/codestyle-js": "^1.1.0",
+    "@nti/unittesting-clientside": "^2.0.0",
     "babel-cli": "^6.1.0",
     "babel-eslint": "^8.2.2",
     "babel-polyfill": "^6.1.0",
-    "babel-preset-env": "^1.1.4",
-    "nti-unittesting-clientside": "^2.0.0"
+    "babel-preset-env": "^1.1.4"
   }
 }
