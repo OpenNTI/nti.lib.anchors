@@ -22,6 +22,9 @@
     "type": "git",
     "url": "https://github.com/NextThought/nti.lib.anchors.git"
   },
+  "publishConfig": {
+    "registry": "https://npm.nextthought.com"
+  },
   "dependencies": {
     "@nti/lib-dom": "^1.0.0",
     "@nti/lib-interfaces": "^1.0.0",
