@@ -5,8 +5,10 @@
   "license": "UNLICENSED",
   "description": "Content Anchor handling library",
   "main": "lib/index.js",
+  "module": "src/index.js",
   "files": [
-    "lib"
+    "lib",
+    "src"
   ],
   "engines": {
     "node": ">=5.0.0",
@@ -33,9 +35,10 @@
   "devDependencies": {
     "@nti/codestyle-js": "^1.1.0",
     "@nti/unittesting-clientside": "^2.0.0",
-    "babel-cli": "^6.1.0",
-    "babel-eslint": "^8.2.2",
-    "babel-polyfill": "^6.1.0",
-    "babel-preset-env": "^1.1.4"
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-eslint": "^9.0.0"
   }
 }

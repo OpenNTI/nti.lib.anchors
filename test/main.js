@@ -1,4 +1,4 @@
-require('babel-polyfill');
+require('@babel/polyfill');
 if (typeof localStorage !== 'undefined') {
 	localStorage.setItem('debug', 'off');
 }

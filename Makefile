@@ -24,4 +24,4 @@ lib: $(LIB)
 lib/%.js: src/%.js
 #	@echo babel	$@...
 	@mkdir -p $(@D)
-	babel $< -o $@
+	babel $< -o $@ --no-babelrc
