@@ -5,6 +5,7 @@
   "license": "UNLICENSED",
   "description": "Content Anchor handling library",
   "main": "lib/index.js",
+  "module": "src/index.js",
   "files": [
     "lib",
     "src"
