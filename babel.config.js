@@ -1,6 +1,9 @@
+'use strict';
+const base = require('@nti/lib-scripts/config/babel.config');
+
 module.exports = function (api) {
-	api.cache(false);
 	return {
+		...base(api),
 		babelrc: false,
 		presets: [
 			['@babel/preset-env', {
@@ -11,7 +14,8 @@ module.exports = function (api) {
 						'not dead'
 					]
 				}
-			}]
+			}],
+			'@babel/preset-flow'
 		]
 	};
 };
