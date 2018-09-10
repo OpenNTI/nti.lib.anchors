@@ -1,6 +1,6 @@
 {
   "name": "@nti/lib-anchors",
-  "version": "1.7.0",
+  "version": "1.8.0-alpha",
   "author": "nextthought",
   "license": "UNLICENSED",
   "description": "Content Anchor handling library",
