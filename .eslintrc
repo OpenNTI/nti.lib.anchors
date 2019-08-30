@@ -1,6 +1,5 @@
 {
-	"extends": "./node_modules/@nti/codestyle-js/index.js",
-	"parser": "babel-eslint",
+	"extends": "@nti/eslint-config-lib-scripts",
 	"rules": {
 		"import/no-commonjs": 0,
 		"import/no-extraneous-dependencies": 0,

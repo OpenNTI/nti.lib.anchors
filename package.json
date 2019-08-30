@@ -4,20 +4,14 @@
   "author": "nextthought",
   "license": "UNLICENSED",
   "description": "Content Anchor handling library",
-  "main": "lib/index.js",
-  "module": "src/index.js",
+  "main": "src/index.js",
   "files": [
-    "lib",
     "src"
   ],
-  "engines": {
-    "node": ">=5.0.0",
-    "npm": ">=3.3.0"
-  },
   "scripts": {
     "test": "karma start --single-run --reporters dots,html,junit,coverage",
     "start": "make check",
-    "prepack": "make check && npm test && make",
+    "prepack": "make check && npm test",
     "release": "./release.sh"
   },
   "repository": {
@@ -33,13 +27,11 @@
     "@nti/util-logger": "^1.0.0"
   },
   "devDependencies": {
-    "@nti/codestyle-js": "^1.1.0",
-    "@nti/lib-scripts": "^2.0.0",
+    "@nti/lib-scripts": "^2.12.4",
     "@nti/unittesting-clientside": "^2.2.2",
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "babel-eslint": "^9.0.0"
+    "@babel/preset-env": "^7.0.0"
   }
 }

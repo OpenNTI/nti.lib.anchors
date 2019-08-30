@@ -1,4 +1,3 @@
-/*globals document, NodeFilter*/
 import * as DOM from '@nti/lib-dom';
 import {getModel} from '@nti/lib-interfaces';
 import Logger from '@nti/util-logger';
@@ -7,6 +6,7 @@ const logger = Logger.get('lib:anchors');
 const tracelogger = Logger.get('lib:anchors:trace');
 
 const isEmpty = x => x == null || x.length === 0;
+const hasProperty = (o, p) => Object.prototype.hasOwnProperty.call(o, p);
 
 const ContentRangeDescription = getModel('contentrange.contentrangedescription');
 const DomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
@@ -817,7 +817,7 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 
 	startResult = locateRangePointInAncestor(rangeDesc.getStart(), ancestor);
 	if (!startResult.node ||
-		!startResult.hasOwnProperty('confidence') ||
+		!hasProperty(startResult, 'confidence') ||
 		startResult.confidence === 0) {
 		tracelogger.warn('No possible start found for', rangeDesc, startResult);
 		return null;
@@ -837,7 +837,7 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 
 	endResult = locateRangePointInAncestor(rangeDesc.getEnd(), ancestor, startResult);
 	if (!endResult.node ||
-		!endResult.hasOwnProperty('confidence') ||
+		!hasProperty(endResult, 'confidence') ||
 		endResult.confidence === 0) {
 
 		tracelogger.warn('No possible end found for', rangeDesc, endResult);
@@ -898,14 +898,14 @@ function convertContentRangeToDomRange (startResult, endResult, docElement) {
 	}
 
 	range = createRange(docElement);
-	if (liveStartResult.hasOwnProperty('offset')) {
+	if (hasProperty(liveStartResult, 'offset')) {
 		range.setStart(liveStartResult.container, liveStartResult.offset);
 	}
 	else {
 		range.setStartBefore(liveStartResult.container);
 	}
 
-	if (liveEndResult.hasOwnProperty('offset')) {
+	if (hasProperty(liveEndResult, 'offset')) {
 		range.setEnd(liveEndResult.container, liveEndResult.offset);
 	}
 	else {
@@ -947,7 +947,7 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 
 
 	for (i in potentials) {
-		if (potentials.hasOwnProperty(i)) {
+		if (hasProperty(potentials, i)) {
 			p = potentials[i];
 			if (doesElementMatchPointer(p, pointer)) {
 				r = {confidence: 1, node: p};
