@@ -11,7 +11,6 @@
   "scripts": {
     "test": "karma start --single-run --reporters dots,html,junit,coverage",
     "start": "make check",
-    "prepack": "make check && npm test",
     "release": "./release.sh"
   },
   "repository": {
@@ -22,13 +21,13 @@
     "registry": "https://npm.nextthought.com"
   },
   "dependencies": {
-    "@nti/lib-dom": "^1.0.0",
-    "@nti/lib-interfaces": "^1.0.0",
-    "@nti/util-logger": "^1.0.0"
+    "@nti/lib-dom": "NextThought/nti.lib.dom",
+    "@nti/lib-interfaces": "NextThought/nti.lib.interfaces",
+    "@nti/util-logger": "NextThought/nti.util.logger"
   },
   "devDependencies": {
     "@nti/lib-scripts": "^2.12.4",
-    "@nti/unittesting-clientside": "^2.2.2",
+    "@nti/unittesting-clientside": "NextThought/nti.config.unittesting.clientside",
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
