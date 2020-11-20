@@ -1,4 +1,4 @@
-lib/
-node_modules/
-reports/
-package-lock.json
+/lib/
+/node_modules/
+/reports/
+/docs/

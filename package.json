@@ -9,9 +9,11 @@
     "src"
   ],
   "scripts": {
-    "test": "karma start --single-run --reporters dots,html,junit,coverage",
-    "start": "make check",
-    "release": "./release.sh"
+    "test": "lib-scripts test",
+    "start": "lib-scripts test --watch",
+    "clean": "lib-scripts clean",
+    "check": "lib-scripts check",
+    "release": "lib-scripts release"
   },
   "repository": {
     "type": "git",
@@ -20,17 +22,13 @@
   "publishConfig": {
     "registry": "https://npm.nextthought.com"
   },
+  "testEnvironment": "jsdom",
   "dependencies": {
     "@nti/lib-dom": "NextThought/nti.lib.dom",
     "@nti/lib-interfaces": "NextThought/nti.lib.interfaces",
     "@nti/util-logger": "NextThought/nti.util.logger"
   },
   "devDependencies": {
-    "@nti/lib-scripts": "^2.12.4",
-    "@nti/unittesting-clientside": "NextThought/nti.config.unittesting.clientside",
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.0.0"
+    "@nti/lib-scripts": "^2.12.4"
   }
 }
