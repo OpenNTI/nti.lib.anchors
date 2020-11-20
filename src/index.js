@@ -4,6 +4,7 @@ import Logger from '@nti/util-logger';
 
 const logger = Logger.get('lib:anchors');
 const tracelogger = Logger.get('lib:anchors:trace');
+tracelogger.log = tracelogger.info = tracelogger.debug;
 
 const isEmpty = x => x == null || x.length === 0;
 const hasProperty = (o, p) => Object.prototype.hasOwnProperty.call(o, p);
