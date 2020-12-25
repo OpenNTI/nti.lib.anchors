@@ -53,13 +53,6 @@ jobs:
           npm config set "${NPM_REGISTRY/https:/}/:_authToken" "$NPM_TOKEN"
           git config --global url."git@github.com:".insteadOf "https://github.com/"
 
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: install dependencies
         run: |
           (test ! -f package-lock.json && npm i) || echo 'Lock found, skipping npm i'
