@@ -1,5 +1,5 @@
 import * as DOM from '@nti/lib-dom';
-import {getModel} from '@nti/lib-interfaces';
+import { getModel } from '@nti/lib-interfaces';
 import Logger from '@nti/util-logger';
 
 const logger = Logger.get('lib:anchors');
@@ -9,100 +9,119 @@ tracelogger.log = tracelogger.info = tracelogger.debug;
 const isEmpty = x => x == null || x.length === 0;
 const hasProperty = (o, p) => Object.prototype.hasOwnProperty.call(o, p);
 
-const ContentRangeDescription = getModel('contentrange.contentrangedescription');
-const DomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
+const ContentRangeDescription = getModel(
+	'contentrange.contentrangedescription'
+);
+const DomContentRangeDescription = getModel(
+	'contentrange.domcontentrangedescription'
+);
 
-const ElementDomContentPointer = getModel('contentrange.elementdomcontentpointer');
+const ElementDomContentPointer = getModel(
+	'contentrange.elementdomcontentpointer'
+);
 const TextDomContentPointer = getModel('contentrange.textdomcontentpointer');
 
 const TextContext = getModel('contentrange.textcontext');
 
 const CONTAINER_SELECTORS = [
 	'[type$=naquestion][data-ntiid]',
-	'[type$=ntivideo][data-ntiid]'
+	'[type$=ntivideo][data-ntiid]',
 ];
 
 export const PURIFICATION_TAG = 'data-nti-purification-tag';
 export const NON_ANCHORABLE_ATTRIBUTE = 'data-non-anchorable';
 export const NO_ANCHORABLE_CHILDREN_ATTRIBUTE = 'data-no-anchors-within';
 
-
-export function isNodeIgnored (node) {
-	return Boolean(	node.getAttribute(NON_ANCHORABLE_ATTRIBUTE) ||
-					node.getAttribute(NO_ANCHORABLE_CHILDREN_ATTRIBUTE));
+export function isNodeIgnored(node) {
+	return Boolean(
+		node.getAttribute(NON_ANCHORABLE_ATTRIBUTE) ||
+			node.getAttribute(NO_ANCHORABLE_CHILDREN_ATTRIBUTE)
+	);
 }
-
 
 const IGNORE_WHITESPACE_TEXTNODES = true;
 const IGNORE_WHITESPACE_TEXTNODE_FILTER = {
-	acceptNode (node) {
+	acceptNode(node) {
 		if (node.nodeType === 3) {
 			if (isEmpty(node.textContent.trim())) {
 				return NodeFilter.FILTER_REJECT;
 			}
 		}
 		return NodeFilter.FILTER_ACCEPT;
-	}
+	},
 };
 
-
-function escapeId (id) {
-	return id.replace(/:/g, '\\3a ') //no colons
-		.replace(/,/g, '\\2c ')//no commas
-		.replace(/\./g, '\\2e ');//no periods
+function escapeId(id) {
+	return id
+		.replace(/:/g, '\\3a ') //no colons
+		.replace(/,/g, '\\2c ') //no commas
+		.replace(/\./g, '\\2e '); //no periods
 }
 
-function getWhitespaceFilter () {
+function getWhitespaceFilter() {
 	if (!IGNORE_WHITESPACE_TEXTNODES) {
 		return null;
 	}
 
 	//Sigh. Imagine that, some browsers want a proper NodeFilter and some want just a function.
 	//See http://stackoverflow.com/questions/5982648/recommendations-for-working-around-ie9-treewalker-filter-bug
-	let {acceptNode} = IGNORE_WHITESPACE_TEXTNODE_FILTER;
+	let { acceptNode } = IGNORE_WHITESPACE_TEXTNODE_FILTER;
 
-	function safeFilter (...a) { return acceptNode(...a); }
-	Object.assign(safeFilter, {acceptNode});
+	function safeFilter(...a) {
+		return acceptNode(...a);
+	}
+	Object.assign(safeFilter, { acceptNode });
 
 	return safeFilter;
 }
 
-
 //Is this a content range description we know how to deal with.
 //We handle non nil values that are empty or dom content range descriptions
-function supportedContentRange (contentRangeDescription) {
+function supportedContentRange(contentRangeDescription) {
 	if (!contentRangeDescription) {
 		return false;
 	}
 
-	return contentRangeDescription.isEmpty || contentRangeDescription.isDomContentRangeDescription;
+	return (
+		contentRangeDescription.isEmpty ||
+		contentRangeDescription.isDomContentRangeDescription
+	);
 }
-
 
 const ANCHOR_LIB_API = {
 	locateElementDomContentPointer,
-	locateRangeEdgeForAnchor
+	locateRangeEdgeForAnchor,
 };
 
-
-function locateRangePointInAncestor (model, ...ancestorNode) {
+function locateRangePointInAncestor(model, ...ancestorNode) {
 	return model.locateRangePointInAncestor(ANCHOR_LIB_API, ...ancestorNode);
 }
 
-
 //FIXME we run into potential problems with this is ContentRangeDescriptions ever occur in different documents
 //or locations but have the same container id.  That seem unlikely but may Need to figure that out eventually
-export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cleanRoot, containers, docElementContainerId) {
+export function preresolveLocatorInfo(
+	contentRangeDescriptions,
+	docElement,
+	cleanRoot,
+	containers,
+	docElementContainerId
+) {
 	let virginContentCache = {};
 	let locatorsFound = 0;
 
-	docElementContainerId = docElementContainerId || rootContainerIdFromDocument(docElement);
+	docElementContainerId =
+		docElementContainerId || rootContainerIdFromDocument(docElement);
 
-	if (!contentRangeDescriptions || (containers && contentRangeDescriptions.length !== containers.length)) {
-		throw new Error('toDomRanges requires contentRangeDescriptions and containers to be the same length if containers provided');
+	if (
+		!contentRangeDescriptions ||
+		(containers && contentRangeDescriptions.length !== containers.length)
+	) {
+		throw new Error(
+			'toDomRanges requires contentRangeDescriptions and containers to be the same length if containers provided'
+		);
 	}
 
-	function getVirginNode (node) {
+	function getVirginNode(node) {
 		let theId = node.getAttribute('id'),
 			key = theId || node,
 			clean;
@@ -119,11 +138,19 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 		return clean;
 	}
 
-	function cacheLocatorForDescription (desc, docElement2, cleanRoot2, containerId2, docElementContainerId2) {
+	function cacheLocatorForDescription(
+		desc,
+		docElement2,
+		cleanRoot2,
+		containerId2,
+		docElementContainerId2
+	) {
 		let searchWithin, ancestorNode, virginNode;
 
 		if (!containerId2) {
-			tracelogger.warn('No container id provided will assume root without validating container');
+			tracelogger.warn(
+				'No container id provided will assume root without validating container'
+			);
 		}
 
 		if (!supportedContentRange(desc)) {
@@ -136,14 +163,29 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 			return;
 		}
 
-		searchWithin = scopedContainerNode(cleanRoot2, containerId2, docElementContainerId2);
+		searchWithin = scopedContainerNode(
+			cleanRoot2,
+			containerId2,
+			docElementContainerId2
+		);
 		if (!searchWithin) {
-			throw new Error('Unable to find container ' + containerId2 + ' in provided doc element');
+			throw new Error(
+				'Unable to find container ' +
+					containerId2 +
+					' in provided doc element'
+			);
 		}
 
-		ancestorNode = locateRangePointInAncestor(desc.getAncestor(), searchWithin).node || searchWithin;
+		ancestorNode =
+			locateRangePointInAncestor(desc.getAncestor(), searchWithin).node ||
+			searchWithin;
 		if (!ancestorNode) {
-			throw new Error('Failed to get ancestor node for description. ' + desc + ' This should happen b/c we should default to ' + searchWithin);
+			throw new Error(
+				'Failed to get ancestor node for description. ' +
+					desc +
+					' This should happen b/c we should default to ' +
+					searchWithin
+			);
 		}
 
 		virginNode = getVirginNode(ancestorNode);
@@ -152,8 +194,7 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 			if (resolveCleanLocatorForDesc(desc, virginNode, docElement2)) {
 				locatorsFound++;
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			logger.error('Error resolving locator for desc', desc, e);
 		}
 	}
@@ -163,19 +204,34 @@ export function preresolveLocatorInfo (contentRangeDescriptions, docElement, cle
 	contentRangeDescriptions.forEach((desc, idx) => {
 		let containerId = containers ? containers[idx] : null;
 		try {
-			cacheLocatorForDescription(desc, docElement, cleanRoot, containerId, docElementContainerId);
-		}
-		catch (e) {
+			cacheLocatorForDescription(
+				desc,
+				docElement,
+				cleanRoot,
+				containerId,
+				docElementContainerId
+			);
+		} catch (e) {
 			logger.error('Unable to generate locator for desc', e);
 		}
 	});
 
-	logger[locatorsFound === contentRangeDescriptions.length ?
-		'log' : 'warn']('Preresolved ' + locatorsFound + '/' + contentRangeDescriptions.length + ' range descriptions');
+	logger[locatorsFound === contentRangeDescriptions.length ? 'log' : 'warn'](
+		'Preresolved ' +
+			locatorsFound +
+			'/' +
+			contentRangeDescriptions.length +
+			' range descriptions'
+	);
 }
 
-
-export function toDomRange (contentRangeDescription, docElement, cleanRoot, containerId, docElementContainerId) {
+export function toDomRange(
+	contentRangeDescription,
+	docElement,
+	cleanRoot,
+	containerId,
+	docElementContainerId
+) {
 	let ancestorNode, resultRange, searchWithin, locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
@@ -183,12 +239,14 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 		return null;
 	}
 
-	docElementContainerId = docElementContainerId || rootContainerIdFromDocument(docElement);
+	docElementContainerId =
+		docElementContainerId || rootContainerIdFromDocument(docElement);
 
 	try {
-
 		if (!containerId) {
-			tracelogger.log('No container id provided will use root without validating container ids');
+			tracelogger.log(
+				'No container id provided will use root without validating container ids'
+			);
 		}
 
 		//FIXME we run into potential problems with this is ContentRangeDescriptions ever occur in different documents
@@ -197,58 +255,88 @@ export function toDomRange (contentRangeDescription, docElement, cleanRoot, cont
 		//TODO a potential optimization here is that if locator() is defined but null return null.  We already tried
 		//to resolve it once and it failed.  Right now we try again but in reality nothing changes between when we
 		//preresolve the locator and now
-		locator = cachedLocatorEnsuringDocument(contentRangeDescription, docElement);
+		locator = cachedLocatorEnsuringDocument(
+			contentRangeDescription,
+			docElement
+		);
 		if (locator) {
-			return convertContentRangeToDomRange(locator.start, locator.end, locator.doc);
+			return convertContentRangeToDomRange(
+				locator.start,
+				locator.end,
+				locator.doc
+			);
 		}
 
-
 		if (contentRangeDescription.isEmpty) {
-			return createEmptyContentRangeDescription(docElement, containerId, docElementContainerId);
+			return createEmptyContentRangeDescription(
+				docElement,
+				containerId,
+				docElementContainerId
+			);
 		}
 
 		if (!cleanRoot) {
-			cleanRoot = (docElement.body || findElementsWithTagName(docElement, 'body')[0] || docElement).cloneNode(true);
+			cleanRoot = (
+				docElement.body ||
+				findElementsWithTagName(docElement, 'body')[0] ||
+				docElement
+			).cloneNode(true);
 			purifyNode(cleanRoot);
 		}
 
-		searchWithin = scopedContainerNode(cleanRoot, containerId, docElementContainerId);
+		searchWithin = scopedContainerNode(
+			cleanRoot,
+			containerId,
+			docElementContainerId
+		);
 		if (!searchWithin) {
-			throw new Error('Unable to find container ' + containerId + ' in provided doc element');
+			throw new Error(
+				'Unable to find container ' +
+					containerId +
+					' in provided doc element'
+			);
 		}
-		ancestorNode = locateRangePointInAncestor(contentRangeDescription.getAncestor(), searchWithin).node || searchWithin;
+		ancestorNode =
+			locateRangePointInAncestor(
+				contentRangeDescription.getAncestor(),
+				searchWithin
+			).node || searchWithin;
 
 		if (!ancestorNode) {
-			throw new Error('Failed to get ancestor node for description. ' + contentRangeDescription +
-							' This should happen b/c we should default to ' + searchWithin);
+			throw new Error(
+				'Failed to get ancestor node for description. ' +
+					contentRangeDescription +
+					' This should happen b/c we should default to ' +
+					searchWithin
+			);
 		}
 
-		resultRange = resolveSpecBeneathAncestor(contentRangeDescription, ancestorNode, docElement);
+		resultRange = resolveSpecBeneathAncestor(
+			contentRangeDescription,
+			ancestorNode,
+			docElement
+		);
 
 		return resultRange;
-	}
-	catch (e) {
+	} catch (e) {
 		logger.warn('Unable to generate range for description', e);
 	}
 	return null;
 }
 
-
-function findElementsWithTagName (root, name) {
+function findElementsWithTagName(root, name) {
 	if (root.getElementsByTagName) {
 		return root.getElementsByTagName(name);
 	}
 	return root.querySelectorAll(name);
 }
 
-
-function createRange (contextNode) {
+function createRange(contextNode) {
 	if (!contextNode.createRange) {
 		contextNode = contextNode.ownerDocument || document;
 	}
 	return contextNode.createRange();
 }
-
 
 /*
  *	Returns a boolean indicating whether or not the provided contentRangeDescription
@@ -263,8 +351,14 @@ function createRange (contextNode) {
  *  Note: if we find ourselves using inside a loop over contentRangeDescriptions on the same node
  *  an optimized versio nof this function should be written and used
  */
-export function doesContentRangeDescriptionResolve (contentRangeDescription, node, doc) {
-	let result, range, theDoc = (node && node.ownerDocument) || doc;
+export function doesContentRangeDescriptionResolve(
+	contentRangeDescription,
+	node,
+	doc
+) {
+	let result,
+		range,
+		theDoc = (node && node.ownerDocument) || doc;
 
 	//Ok so this sucks.  There is a complicated reason why we can't let ourselves
 	//use our cached locator for this query.  Basically, the locator gets cached by the owner document
@@ -280,8 +374,11 @@ export function doesContentRangeDescriptionResolve (contentRangeDescription, nod
 		contentRangeDescription.attachLocator(null);
 	}
 
-	range = locateContentRangeDescription(contentRangeDescription, node, theDoc);
-
+	range = locateContentRangeDescription(
+		contentRangeDescription,
+		node,
+		theDoc
+	);
 
 	result = !!range;
 	if (range && range.detach) {
@@ -290,11 +387,19 @@ export function doesContentRangeDescriptionResolve (contentRangeDescription, nod
 	return result;
 }
 
-
 //TODO lots of duplicated code here
-function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc) {
-	let ancestorNode, resultRange, searchWithin, containerId, docElementContainerId,
-		docElement = (cleanRoot && cleanRoot.ownerDocument) || doc, locator;
+function locateContentRangeDescription(
+	contentRangeDescription,
+	cleanRoot,
+	doc
+) {
+	let ancestorNode,
+		resultRange,
+		searchWithin,
+		containerId,
+		docElementContainerId,
+		docElement = (cleanRoot && cleanRoot.ownerDocument) || doc,
+		locator;
 
 	if (!supportedContentRange(contentRangeDescription)) {
 		tracelogger.warn('nothing to parse?');
@@ -304,9 +409,10 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 	docElementContainerId = rootContainerIdFromDocument(docElement);
 
 	try {
-
 		if (!containerId) {
-			tracelogger.log('No container id provided will use root without validating container ids');
+			tracelogger.log(
+				'No container id provided will use root without validating container ids'
+			);
 		}
 
 		//FIXME we run into potential problems with this is ContentRangeDescriptions ever occur in different documents
@@ -315,47 +421,85 @@ function locateContentRangeDescription (contentRangeDescription, cleanRoot, doc)
 		//TODO a potential optimization here is that if locator() is defined but null return null.  We already tried
 		//to resolve it once and it failed.  Right now we try again but in reality nothing changes between when we
 		//preresolve the locator and now
-		locator = cachedLocatorEnsuringDocument(contentRangeDescription, docElement);
+		locator = cachedLocatorEnsuringDocument(
+			contentRangeDescription,
+			docElement
+		);
 		if (locator) {
-			return convertContentRangeToDomRange(locator.start, locator.end, locator.doc);
+			return convertContentRangeToDomRange(
+				locator.start,
+				locator.end,
+				locator.doc
+			);
 		}
 
-
 		if (contentRangeDescription.isEmpty) {
-			return createEmptyContentRangeDescription(docElement, containerId, docElementContainerId);
+			return createEmptyContentRangeDescription(
+				docElement,
+				containerId,
+				docElementContainerId
+			);
 		}
 
 		if (!cleanRoot) {
-			cleanRoot = (docElement.body || findElementsWithTagName(docElement, 'body')[0] || docElement).cloneNode(true);
+			cleanRoot = (
+				docElement.body ||
+				findElementsWithTagName(docElement, 'body')[0] ||
+				docElement
+			).cloneNode(true);
 			purifyNode(cleanRoot);
 		}
 
-		searchWithin = scopedContainerNode(cleanRoot, containerId, docElementContainerId);
+		searchWithin = scopedContainerNode(
+			cleanRoot,
+			containerId,
+			docElementContainerId
+		);
 		if (!searchWithin) {
-			throw new Error('Unable to find container ' + containerId + ' in provided doc element');
+			throw new Error(
+				'Unable to find container ' +
+					containerId +
+					' in provided doc element'
+			);
 		}
-		ancestorNode = locateRangePointInAncestor(contentRangeDescription.getAncestor(), searchWithin).node || searchWithin;
+		ancestorNode =
+			locateRangePointInAncestor(
+				contentRangeDescription.getAncestor(),
+				searchWithin
+			).node || searchWithin;
 
 		if (!ancestorNode) {
-			throw new Error('Failed to get ancestor node for description. ' + contentRangeDescription + ' This should happen b/c we should default to ' + searchWithin);
+			throw new Error(
+				'Failed to get ancestor node for description. ' +
+					contentRangeDescription +
+					' This should happen b/c we should default to ' +
+					searchWithin
+			);
 		}
 
-		resultRange = resolveCleanLocatorForDesc(contentRangeDescription, ancestorNode, docElement);
+		resultRange = resolveCleanLocatorForDesc(
+			contentRangeDescription,
+			ancestorNode,
+			docElement
+		);
 
 		return resultRange;
-	}
-	catch (e) {
+	} catch (e) {
 		tracelogger.warn('Unable to generate range for description', e);
 	}
 	return null;
 }
 
-
-function createEmptyContentRangeDescription (docElement, containerId, rootId) {
-	let searchWithin = scopedContainerNode(docElement, containerId, rootId), resultRange;
+function createEmptyContentRangeDescription(docElement, containerId, rootId) {
+	let searchWithin = scopedContainerNode(docElement, containerId, rootId),
+		resultRange;
 
 	if (!searchWithin) {
-		throw new Error('Unable to find container ' + containerId + ' in provided docElement');
+		throw new Error(
+			'Unable to find container ' +
+				containerId +
+				' in provided docElement'
+		);
 	}
 
 	//logger.debug('Given an empty content range description, returning a range wrapping the container', searchWithin);
@@ -364,8 +508,7 @@ function createEmptyContentRangeDescription (docElement, containerId, rootId) {
 	return resultRange;
 }
 
-
-function cachedLocatorEnsuringDocument (contentRangeDescription, document) {
+function cachedLocatorEnsuringDocument(contentRangeDescription, document) {
 	let loc = contentRangeDescription.locator();
 	if (loc && loc.doc !== document) {
 		logger.debug('Dumping locator because its from a different doc');
@@ -375,41 +518,47 @@ function cachedLocatorEnsuringDocument (contentRangeDescription, document) {
 	return loc;
 }
 
-
 /*tested*/
-export function scopedContainerNode (fragOrNode, containerId, rootId) {
+export function scopedContainerNode(fragOrNode, containerId, rootId) {
 	let searchWithin,
-		node = fragOrNode.body || findElementsWithTagName(fragOrNode, 'body')[0] || fragOrNode;
+		node =
+			fragOrNode.body ||
+			findElementsWithTagName(fragOrNode, 'body')[0] ||
+			fragOrNode;
 
 	if (!containerId) {
 		searchWithin = node;
-	}
-	else {
-		searchWithin = (rootId !== containerId) ? getContainerNode(containerId, node, null) : node;
+	} else {
+		searchWithin =
+			rootId !== containerId
+				? getContainerNode(containerId, node, null)
+				: node;
 	}
 
 	return searchWithin;
 }
 
-
 //Exported for tests
-export function rootContainerIdFromDocument (doc) {
+export function rootContainerIdFromDocument(doc) {
 	if (!doc) {
 		return null;
 	}
 
-	let foundContainer, metaNtiidTag,
+	let foundContainer,
+		metaNtiidTag,
 		head = doc.head || findElementsWithTagName(doc, 'head')[0];
 
 	if (head) {
 		metaNtiidTag = head.querySelectorAll('meta[name="NTIID"]');
 		if (metaNtiidTag && metaNtiidTag.length > 0) {
 			if (metaNtiidTag.length > 1) {
-				logger.error('Encountered more than one NTIID meta tag. Using first, expect problems', metaNtiidTag);
+				logger.error(
+					'Encountered more than one NTIID meta tag. Using first, expect problems',
+					metaNtiidTag
+				);
 			}
 			metaNtiidTag = metaNtiidTag[0];
-		}
-		else {
+		} else {
 			metaNtiidTag = null;
 		}
 		if (metaNtiidTag) {
@@ -419,18 +568,22 @@ export function rootContainerIdFromDocument (doc) {
 	return foundContainer;
 }
 
-
 /* tested */
-export function createRangeDescriptionFromRange (range, docElement) {
+export function createRangeDescriptionFromRange(range, docElement) {
 	if (!range) {
-		tracelogger.log('Returning empty ContentRangeDescription for null range');
-		return {description: new ContentRangeDescription(null, null, {})};
+		tracelogger.log(
+			'Returning empty ContentRangeDescription for null range'
+		);
+		return { description: new ContentRangeDescription(null, null, {}) };
 	}
 
 	cleanRangeFromBadStartAndEndContainers(range);
 	range = makeRangeAnchorable(range, docElement);
 	if (!range || range.collapsed) {
-		logger.error('Anchorable range for provided range could not be found', range);
+		logger.error(
+			'Anchorable range for provided range could not be found',
+			range
+		);
 		throw new Error('Anchorable range for range could not be found');
 	}
 
@@ -440,7 +593,9 @@ export function createRangeDescriptionFromRange (range, docElement) {
 
 	if (!pureRange || pureRange.collapsed) {
 		logger.error('Unable to purify anchorable range', range, pureRange);
-		throw new Error('Unable to purify anchorable range for ContentRangeDescription generation');
+		throw new Error(
+			'Unable to purify anchorable range for ContentRangeDescription generation'
+		);
 	}
 
 	//If the ancestorcontainer is a text node, we want a containing element as per the docs
@@ -455,21 +610,23 @@ export function createRangeDescriptionFromRange (range, docElement) {
 
 	let ancestorAnchor = new ElementDomContentPointer(null, null, {
 		node: ancestorNode,
-		role: 'ancestor'
+		role: 'ancestor',
 	});
 
 	try {
 		result.description = new DomContentRangeDescription(null, null, {
 			start: createPointer(pureRange, 'start'),
 			end: createPointer(pureRange, 'end'),
-			ancestor: ancestorAnchor
+			ancestor: ancestorAnchor,
 		});
 	} catch (e) {
-		logger.warn('There was an error generating the description, hopefully the container will do.', e);
+		logger.warn(
+			'There was an error generating the description, hopefully the container will do.',
+			e
+		);
 	}
 	return result;
 }
-
 
 /*
  *	Returns the node for the supplied container or defaultNode
@@ -477,28 +634,30 @@ export function createRangeDescriptionFromRange (range, docElement) {
  *  to a node that isn't valid as described by getContainerNtiid
  *  we warn and return the node anyway
  */
-function getContainerNode (containerId, root, defaultNode) {
-	let result, isContainerNode = false,
+function getContainerNode(containerId, root, defaultNode) {
+	let result,
+		isContainerNode = false,
 		potentials = [];
 
 	if (!containerId) {
 		return null;
 	}
 
-
 	if (containerId.indexOf('tag:nextthought.com') >= 0) {
-		for(let x of root.querySelectorAll(`[data-ntiid=${escapeId(containerId)}]`)) {
+		for (let x of root.querySelectorAll(
+			`[data-ntiid=${escapeId(containerId)}]`
+		)) {
 			if (x.getAttribute('data-ntiid') === containerId) {
 				potentials.push(x);
 			}
 		}
-	}
-	else {
+	} else {
 		if (root.getElementById) {
 			potentials.push(root.getElementById(containerId));
-		}
-		else {
-			potentials = root.querySelectorAll(`[id="${escapeId(containerId)}"]`);
+		} else {
+			potentials = root.querySelectorAll(
+				`[id="${escapeId(containerId)}"]`
+			);
 		}
 	}
 
@@ -508,22 +667,28 @@ function getContainerNode (containerId, root, defaultNode) {
 
 	if (potentials.length > 1) {
 		//TODO what do we actually do here?
-		logger.warn('Found several matches for container. Will return first. Bad content?', containerId, potentials);
+		logger.warn(
+			'Found several matches for container. Will return first. Bad content?',
+			containerId,
+			potentials
+		);
 	}
 
 	result = potentials[0];
 
-	for(let sel of CONTAINER_SELECTORS) {
+	for (let sel of CONTAINER_SELECTORS) {
 		isContainerNode = isContainerNode || DOM.matches(result, sel);
 	}
 
 	if (!isContainerNode) {
-		tracelogger.warn('Found container we think is an invalid container node', result);
+		tracelogger.warn(
+			'Found container we think is an invalid container node',
+			result
+		);
 	}
 
 	return result;
 }
-
 
 /*
  *	Finds a containerId for the closet valid container
@@ -535,22 +700,24 @@ function getContainerNode (containerId, root, defaultNode) {
  *
  * Exported for tests
  */
-export function getContainerNtiid (node, def) {
-	let n = node, ntiidAttr = 'data-ntiid', containerNode;
+export function getContainerNtiid(node, def) {
+	let n = node,
+		ntiidAttr = 'data-ntiid',
+		containerNode;
 
-	function ancestorOrSelfMatchingSelector (x, sel) {
+	function ancestorOrSelfMatchingSelector(x, sel) {
 		if (!x) {
 			return false;
 		}
 		return DOM.matches(x, sel) ? x : DOM.parent(node, sel);
 	}
 
-	function nodeIfObject (x) {
+	function nodeIfObject(x) {
 		if (!x) {
 			return null;
 		}
 
-		for(let sel of CONTAINER_SELECTORS) {
+		for (let sel of CONTAINER_SELECTORS) {
 			let y = ancestorOrSelfMatchingSelector(x, sel);
 			if (y) {
 				return y;
@@ -578,27 +745,34 @@ export function getContainerNtiid (node, def) {
 	return def;
 }
 
-
-function doesElementMatchPointer (element, pointer) {
-	let id = element.id || (element.getAttribute ? element.getAttribute('id') : null);
+function doesElementMatchPointer(element, pointer) {
+	let id =
+		element.id ||
+		(element.getAttribute ? element.getAttribute('id') : null);
 	let tag = (element.tagName || '').toUpperCase();
 
 	let pointerTag = pointer.elementTagName.toUpperCase();
 
-	let idMatches = (id === pointer.elementId || (element.getAttribute && element.getAttribute('data-ntiid') === pointer.elementId));
+	let idMatches =
+		id === pointer.elementId ||
+		(element.getAttribute &&
+			element.getAttribute('data-ntiid') === pointer.elementId);
 	let tagMatches = tag === pointerTag;
 
-	if (!tagMatches && pointer.elementId === 'NTIContent' && tag === 'NTI-CONTENT') {
+	if (
+		!tagMatches &&
+		pointer.elementId === 'NTIContent' &&
+		tag === 'NTI-CONTENT'
+	) {
 		tagMatches = true;
 	}
 
 	return idMatches && tagMatches;
 }
 
-
 //TODO - testing
-function createPointer (range, role, node) {
-	let edgeNode = node || nodeThatIsEdgeOfRange(range, (role === 'start'));
+function createPointer(range, role, node) {
+	let edgeNode = node || nodeThatIsEdgeOfRange(range, role === 'start');
 
 	if (DOM.isTextNode(edgeNode)) {
 		return createTextPointerFromRange(range, role);
@@ -607,8 +781,10 @@ function createPointer (range, role, node) {
 	if (DOM.isElement(edgeNode)) {
 		return new ElementDomContentPointer(null, null, {
 			elementTagName: edgeNode.tagName,
-			elementId: edgeNode.getAttribute('data-ntiid') || edgeNode.getAttribute('id'),
-			role: role
+			elementId:
+				edgeNode.getAttribute('data-ntiid') ||
+				edgeNode.getAttribute('id'),
+			role: role,
 		});
 	}
 
@@ -616,9 +792,8 @@ function createPointer (range, role, node) {
 	throw new Error('Unable to translate node to pointer');
 }
 
-
 /* tested */
-export function createTextPointerFromRange (range, role) {
+export function createTextPointerFromRange(range, role) {
 	if (!range) {
 		throw new Error('Cannot proceed without range');
 	}
@@ -643,12 +818,13 @@ export function createTextPointerFromRange (range, role) {
 		sibling;
 
 	if (!DOM.isTextNode(container)) {
-		container = nodeThatIsEdgeOfRange(range, (role === 'start'));
+		container = nodeThatIsEdgeOfRange(range, role === 'start');
 		offset = role === 'start' ? 0 : container.textContent.length;
 	}
 
 	//If we run into a doc fragment here, then we may have to bump out of the fragment:
-	if (parent.nodeType === 11) { //DOCUMENT_FRAGMENT_NODE
+	if (parent.nodeType === 11) {
+		//DOCUMENT_FRAGMENT_NODE
 		parent = range.ownerNode;
 	}
 
@@ -671,15 +847,24 @@ export function createTextPointerFromRange (range, role) {
 	edgeOffset = offset - normalizedOffset;
 
 	//Now we want to collect subsequent context
-	walker = document.createTreeWalker(referenceNode, NodeFilter.SHOW_TEXT, filter, false);
+	walker = document.createTreeWalker(
+		referenceNode,
+		NodeFilter.SHOW_TEXT,
+		filter,
+		false
+	);
 	walker.currentNode = container;
 
 	nextSiblingFunction = start ? walker.previousNode : walker.nextNode;
 
 	sibling = nextSiblingFunction.call(walker);
 	while (sibling) {
-		if (collectedCharacters >= maxCollectedChars ||
-			contexts.length - 1 >= maxSubsequentContextObjects) { break; }
+		if (
+			collectedCharacters >= maxCollectedChars ||
+			contexts.length - 1 >= maxSubsequentContextObjects
+		) {
+			break;
+		}
 
 		additionalContext = generateAdditionalContext(sibling, role);
 		collectedCharacters += additionalContext.getContextText().length;
@@ -692,21 +877,20 @@ export function createTextPointerFromRange (range, role) {
 		role: role,
 		contexts: contexts,
 		edgeOffset: edgeOffset,
-		ancestor: ancestor
+		ancestor: ancestor,
 	});
 }
 
-
 /* tested */
-export function generateAdditionalContext (relativeNode, role) {
+export function generateAdditionalContext(relativeNode, role) {
 	if (!relativeNode) {
 		throw new Error('Node must not be null');
 	}
-	let contextText = null, offset;
+	let contextText = null,
+		offset;
 	if (role === 'start') {
 		contextText = lastWordFromString(relativeNode.textContent);
-	}
-	else {
+	} else {
 		contextText = firstWordFromString(relativeNode.textContent);
 	}
 
@@ -721,32 +905,34 @@ export function generateAdditionalContext (relativeNode, role) {
 
 	return new TextContext(null, null, {
 		contextText: contextText,
-		contextOffset: offset
+		contextOffset: offset,
 	});
 }
 
-
 /* tested */
-export function generatePrimaryContext (range, role) {
+export function generatePrimaryContext(range, role) {
 	if (!range) {
 		throw new Error('Range must not be null');
 	}
 
 	let container = null,
 		offset = null,
-		contextText, contextOffset, textContent, prefix, suffix;
+		contextText,
+		contextOffset,
+		textContent,
+		prefix,
+		suffix;
 
 	if (role === 'start') {
 		container = range.startContainer;
 		offset = range.startOffset;
-	}
-	else {
+	} else {
 		container = range.endContainer;
 		offset = range.endOffset;
 	}
 
 	if (!DOM.isTextNode(container)) {
-		container = nodeThatIsEdgeOfRange(range, (role === 'start'));
+		container = nodeThatIsEdgeOfRange(range, role === 'start');
 		offset = role === 'start' ? 0 : container.textContent.length;
 	}
 
@@ -758,7 +944,9 @@ export function generatePrimaryContext (range, role) {
 	}
 
 	prefix = lastWordFromString(textContent.substring(0, offset));
-	suffix = firstWordFromString(textContent.substring(offset, textContent.length));
+	suffix = firstWordFromString(
+		textContent.substring(offset, textContent.length)
+	);
 
 	contextText = prefix + suffix;
 	contextOffset = textContent.indexOf(contextText);
@@ -772,31 +960,29 @@ export function generatePrimaryContext (range, role) {
 
 	return new TextContext(null, null, {
 		contextText: contextText,
-		contextOffset: contextOffset
+		contextOffset: contextOffset,
 	});
 }
 
-
 /* tested */
-export function lastWordFromString (str) {
+export function lastWordFromString(str) {
 	if (str == null) {
 		throw new Error('Must supply a string');
 	}
-	return (/\S*\s?$/).exec(str)[0];
+	return /\S*\s?$/.exec(str)[0];
 }
 
-
 /* tested */
-export function firstWordFromString (str) {
+export function firstWordFromString(str) {
 	if (str == null) {
 		throw new Error('Must supply a string');
 	}
-	return (/^\s?\S*/).exec(str)[0];
+	return /^\s?\S*/.exec(str)[0];
 }
 
-
-function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
-	let confidenceCutoff = 0.4, loc,
+function resolveCleanLocatorForDesc(rangeDesc, ancestor, docElement) {
+	let confidenceCutoff = 0.4,
+		loc,
 		startResult,
 		endResult,
 		startResultLocator,
@@ -805,8 +991,7 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 
 	if (!rangeDesc) {
 		throw new Error('Must supply Description');
-	}
-	else if (!docElement) {
+	} else if (!docElement) {
 		throw new Error('Must supply a docElement');
 	}
 
@@ -817,51 +1002,73 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 	}
 
 	startResult = locateRangePointInAncestor(rangeDesc.getStart(), ancestor);
-	if (!startResult.node ||
+	if (
+		!startResult.node ||
 		!hasProperty(startResult, 'confidence') ||
-		startResult.confidence === 0) {
+		startResult.confidence === 0
+	) {
 		tracelogger.warn('No possible start found for', rangeDesc, startResult);
 		return null;
 	}
 
 	if (startResult.confidence < confidenceCutoff) {
-		tracelogger.warn('No start found with an acceptable confidence.', startResult, rangeDesc);
+		tracelogger.warn(
+			'No start found with an acceptable confidence.',
+			startResult,
+			rangeDesc
+		);
 		return null;
 	}
 
 	if (startResult.confidence < 1.0) {
-		tracelogger.log('Matched start with confidence of', startResult.confidence, startResult, rangeDesc);
-	}
-	else {
-		tracelogger.log('Found an exact match for start', startResult, rangeDesc);
+		tracelogger.log(
+			'Matched start with confidence of',
+			startResult.confidence,
+			startResult,
+			rangeDesc
+		);
+	} else {
+		tracelogger.log(
+			'Found an exact match for start',
+			startResult,
+			rangeDesc
+		);
 	}
 
-	endResult = locateRangePointInAncestor(rangeDesc.getEnd(), ancestor, startResult);
-	if (!endResult.node ||
+	endResult = locateRangePointInAncestor(
+		rangeDesc.getEnd(),
+		ancestor,
+		startResult
+	);
+	if (
+		!endResult.node ||
 		!hasProperty(endResult, 'confidence') ||
-		endResult.confidence === 0) {
-
+		endResult.confidence === 0
+	) {
 		tracelogger.warn('No possible end found for', rangeDesc, endResult);
 
 		return null;
 	}
 
 	if (endResult.confidence < confidenceCutoff) {
-
-		tracelogger.warn('No end found with an acceptable confidence.', endResult, rangeDesc);
+		tracelogger.warn(
+			'No end found with an acceptable confidence.',
+			endResult,
+			rangeDesc
+		);
 
 		return null;
 	}
 
 	if (endResult.confidence < 1.0) {
-
-		tracelogger.log('Matched end with confidence of', endResult.confidence, endResult, rangeDesc);
-
-	}
-	else {
-
+		tracelogger.log(
+			'Matched end with confidence of',
+			endResult.confidence,
+			endResult,
+			rangeDesc
+		);
+	} else {
 		tracelogger.log('Found an exact match for end', endResult, rangeDesc);
-
 	}
 
 	startResultLocator = toReferenceNodeXpathAndOffset(startResult);
@@ -869,28 +1076,39 @@ function resolveCleanLocatorForDesc (rangeDesc, ancestor, docElement) {
 
 	//Right not rangeDescriptions and the virgin content are immutable so stash the locator
 	//on the desc to save work
-	locatorInfo = {start: startResultLocator, end: endResultLocator, doc: docElement};
+	locatorInfo = {
+		start: startResultLocator,
+		end: endResultLocator,
+		doc: docElement,
+	};
 	rangeDesc.attachLocator(locatorInfo);
 	return locatorInfo;
 }
 
-
 /* tested */
-export function resolveSpecBeneathAncestor (rangeDesc, ancestor, docElement) {
+export function resolveSpecBeneathAncestor(rangeDesc, ancestor, docElement) {
 	let locator = resolveCleanLocatorForDesc(rangeDesc, ancestor, docElement);
 	if (!locator) {
 		return null;
 	}
 
-	return convertContentRangeToDomRange(locator.start, locator.end, locator.doc);
+	return convertContentRangeToDomRange(
+		locator.start,
+		locator.end,
+		locator.doc
+	);
 }
 
-
 //TODO - testing
-function convertContentRangeToDomRange (startResult, endResult, docElement) {
-
-	let liveStartResult = convertStaticResultToLiveDomContainerAndOffset(startResult, docElement),
-		liveEndResult = convertStaticResultToLiveDomContainerAndOffset(endResult, docElement),
+function convertContentRangeToDomRange(startResult, endResult, docElement) {
+	let liveStartResult = convertStaticResultToLiveDomContainerAndOffset(
+			startResult,
+			docElement
+		),
+		liveEndResult = convertStaticResultToLiveDomContainerAndOffset(
+			endResult,
+			docElement
+		),
 		range;
 
 	//		logger.log('liveStartResult', liveStartResult, 'liveEndResult', liveEndResult);
@@ -901,23 +1119,20 @@ function convertContentRangeToDomRange (startResult, endResult, docElement) {
 	range = createRange(docElement);
 	if (hasProperty(liveStartResult, 'offset')) {
 		range.setStart(liveStartResult.container, liveStartResult.offset);
-	}
-	else {
+	} else {
 		range.setStartBefore(liveStartResult.container);
 	}
 
 	if (hasProperty(liveEndResult, 'offset')) {
 		range.setEnd(liveEndResult.container, liveEndResult.offset);
-	}
-	else {
+	} else {
 		range.setEndAfter(liveEndResult.container);
 	}
 	return range;
 }
 
-
 /* tested */
-export function locateElementDomContentPointer (pointer, ancestor) {
+export function locateElementDomContentPointer(pointer, ancestor) {
 	//only element dom pointers after this point:
 	if (!(pointer instanceof ElementDomContentPointer)) {
 		throw new Error('This method expects ElementDomContentPointers only');
@@ -925,36 +1140,45 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 
 	//In these case of the document body (root) we may be the ancestor
 	if (doesElementMatchPointer(ancestor, pointer)) {
-		return {confidence: 1, node: ancestor};
+		return { confidence: 1, node: ancestor };
 	}
 
 	let theId = pointer.getElementId(),
-		potentials = [], parts,
-		p, i, r;
+		potentials = [],
+		parts,
+		p,
+		i,
+		r;
 
 	if (theId.indexOf('tag:nextthought.com') === 0) {
 		parts = theId.split(',');
 		if (parts.length < 2) {
-			logger.warn('Encountered an ntiid looking id that doesn\'t split by comma');
-		}
-		else {
+			logger.warn(
+				"Encountered an ntiid looking id that doesn't split by comma"
+			);
+		} else {
 			//Note this may not technically be an exact match, but the potentials loop below should weed out any issues
-			potentials = ancestor.querySelectorAll(`[data-ntiid^="${parts[0]}"][data-ntiid$="${parts[parts.length - 1]}"]`);
+			potentials = ancestor.querySelectorAll(
+				`[data-ntiid^="${parts[0]}"][data-ntiid$="${
+					parts[parts.length - 1]
+				}"]`
+			);
 		}
-	}
-	else {
+	} else {
 		potentials = ancestor.querySelectorAll(`[id="${theId}"]`);
 	}
-
 
 	for (i in potentials) {
 		if (hasProperty(potentials, i)) {
 			p = potentials[i];
 			if (doesElementMatchPointer(p, pointer)) {
-				r = {confidence: 1, node: p};
-			}
-			else {
-				tracelogger.warn('Potential match doesn\'t match pointer', p, pointer);
+				r = { confidence: 1, node: p };
+			} else {
+				tracelogger.warn(
+					"Potential match doesn't match pointer",
+					p,
+					pointer
+				);
 			}
 
 			if (r) {
@@ -963,12 +1187,11 @@ export function locateElementDomContentPointer (pointer, ancestor) {
 		}
 	}
 
-	return {confidence: 0};
+	return { confidence: 0 };
 }
 
-
 /* tested */
-export function isNodeChildOfAncestor (node, ancestor) {
+export function isNodeChildOfAncestor(node, ancestor) {
 	while (node && node.parentNode) {
 		if (node.parentNode === ancestor) {
 			return true;
@@ -978,13 +1201,11 @@ export function isNodeChildOfAncestor (node, ancestor) {
 	return false;
 }
 
-
 /* tested */
-export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
+export function locateRangeEdgeForAnchor(pointer, ancestorNode, startResult) {
 	if (!pointer) {
 		throw new Error('Must supply a Pointer');
-	}
-	else if (!(pointer instanceof TextDomContentPointer)) {
+	} else if (!(pointer instanceof TextDomContentPointer)) {
 		throw new Error('ContentPointer must be a TextDomContentPointer');
 	}
 
@@ -1001,13 +1222,15 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 		matches,
 		possibleNodes = [],
 		done = false,
-		i, filter;
+		i,
+		filter;
 
 	if (root.parentNode) {
 		root = root.parentNode;
 	}
 
-	referenceNode = locateRangePointInAncestor(pointer.getAncestor(), root).node;
+	referenceNode = locateRangePointInAncestor(pointer.getAncestor(), root)
+		.node;
 	foundReferenceNode = true;
 	if (!referenceNode) {
 		foundReferenceNode = false;
@@ -1019,21 +1242,29 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 	//We use a tree walker to search beneath the reference node
 	//for textContent matching our contexts
 	filter = getWhitespaceFilter();
-	treeWalker = document.createTreeWalker(referenceNode, NodeFilter.SHOW_TEXT, filter, false);
+	treeWalker = document.createTreeWalker(
+		referenceNode,
+		NodeFilter.SHOW_TEXT,
+		filter,
+		false
+	);
 
 	//If we are looking for the end node.  we want to start
 	//looking where the start node ended.  This is a shortcut
 	//in the event that the found start node is in our reference node
-	if (!isStart && startResult && startResult.node && isNodeChildOfAncestor(startResult.node, referenceNode)) {
-
+	if (
+		!isStart &&
+		startResult &&
+		startResult.node &&
+		isNodeChildOfAncestor(startResult.node, referenceNode)
+	) {
 		treeWalker.currentNode = startResult.node;
 	}
 
 	//We may be in the same textNode as start
 	if (DOM.isTextNode(treeWalker.currentNode)) {
 		textNode = treeWalker.currentNode;
-	}
-	else {
+	} else {
 		textNode = treeWalker.nextNode();
 	}
 
@@ -1049,14 +1280,16 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 			//Always keep the primary.  It should never be empty, but just in case
 			if (ix === 0) {
 				if (isEmpty(c.contextText.trim())) {
-					logger.error('Found a primary context with empty contextText.  Where did that come from?', pointer);
+					logger.error(
+						'Found a primary context with empty contextText.  Where did that come from?',
+						pointer
+					);
 				}
 				return true;
 			}
 			return !isEmpty(c.contextText.trim());
 		});
-	}
-	else {
+	} else {
 		pointer.nonEmptyContexts = pointer.getContexts();
 	}
 
@@ -1084,15 +1317,13 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 	//If we made it through the tree without finding
 	//a node we failed
 	if (possibleNodes.length === 0) {
-		return {confidence: 0};
+		return { confidence: 0 };
 	}
-
 
 	//Did we stop because we found a perfect match?
 	if (possibleNodes[possibleNodes.length - 1].confidence === 1) {
 		result = possibleNodes[possibleNodes.length - 1];
-	}
-	else {
+	} else {
 		//Not a perfect match, if we are in a properly
 		//resolved reference node we want the thing that
 		//makes us the largest range.  If not we fail to resolve
@@ -1104,11 +1335,15 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 			//Instead of doing that maybe instead of not trying to partial match we just take a
 			//deduciton from the overal confidence.
 
-			tracelogger.info('Ignoring fuzzy matching because we could not resolve the pointers ancestor', pointer, possibleNodes, ancestorNode);
+			tracelogger.info(
+				'Ignoring fuzzy matching because we could not resolve the pointers ancestor',
+				pointer,
+				possibleNodes,
+				ancestorNode
+			);
 
-			return {confidence: 0};
+			return { confidence: 0 };
 		}
-
 
 		//We want the best match
 		//NOTE in the past we were "normalizing" the highest confidence
@@ -1116,33 +1351,36 @@ export function locateRangeEdgeForAnchor (pointer, ancestorNode, startResult) {
 		//only is that an improper way to normalize these values,
 		//it is counterintuitive to what we are actually trying to do.
 		if (result === null) {
-			result = {confidence: 0};
+			result = { confidence: 0 };
 		}
 
-		tracelogger.log('Searching for best ' + pointer.getRole() + ' match in ', possibleNodes);
+		tracelogger.log(
+			'Searching for best ' + pointer.getRole() + ' match in ',
+			possibleNodes
+		);
 
 		for (i = 0; i < possibleNodes.length; i++) {
 			if (possibleNodes[i].confidence > result.confidence) {
 				result = possibleNodes[i];
 			}
 		}
-
 	}
 	return result;
 }
 
-
 //Exported for tests
-export function getCurrentNodeMatches (pointer, treeWalker) {
-
+export function getCurrentNodeMatches(pointer, treeWalker) {
 	let currentNode = treeWalker.currentNode,
 		lookingAtNode = currentNode,
 		isStart = pointer.getRole() === 'start',
-		siblingFunction = isStart ? treeWalker.previousNode : treeWalker.nextNode,
+		siblingFunction = isStart
+			? treeWalker.previousNode
+			: treeWalker.nextNode,
 		confidenceMultiplier = 1;
 
-	function multiIndexOf (str, tomatch) {
-		let all = [], next = -2;
+	function multiIndexOf(str, tomatch) {
+		let all = [],
+			next = -2;
 		while (next !== -1) {
 			next = str.indexOf(tomatch, next + 1);
 			if (next !== -1) {
@@ -1152,7 +1390,7 @@ export function getCurrentNodeMatches (pointer, treeWalker) {
 		return all;
 	}
 
-	function getPrimaryContextMatches (context, node, start) {
+	function getPrimaryContextMatches(context, node, start) {
 		if (!node) {
 			return [];
 		}
@@ -1160,7 +1398,6 @@ export function getCurrentNodeMatches (pointer, treeWalker) {
 		let allmatches = [];
 		let adjustedOffset = context.contextOffset;
 		let nodeContent = node.textContent;
-
 
 		if (start) {
 			adjustedOffset = node.textContent.length - adjustedOffset;
@@ -1177,14 +1414,16 @@ export function getCurrentNodeMatches (pointer, treeWalker) {
 			if (score < 0.25) {
 				score = 0.25;
 			}
-			allmatches.push({offset: p[i] + pointer.getEdgeOffset(),
+			allmatches.push({
+				offset: p[i] + pointer.getEdgeOffset(),
 				node: currentNode,
-				confidence: score});
+				confidence: score,
+			});
 		}
 		return allmatches;
 	}
 
-	function secondaryContextMatch (context, node, start) {
+	function secondaryContextMatch(context, node, start) {
 		if (!node) {
 			return 0;
 		}
@@ -1196,19 +1435,26 @@ export function getCurrentNodeMatches (pointer, treeWalker) {
 		if (start) {
 			adjustedOffset = node.textContent.length - adjustedOffset;
 		}
-		return node.textContent.substr(adjustedOffset).indexOf(context.contextText) === 0;
+		return (
+			node.textContent
+				.substr(adjustedOffset)
+				.indexOf(context.contextText) === 0
+		);
 	}
 
-
 	if (pointer.nonEmptyContexts === undefined) {
-
-		tracelogger.error('nonEmptyContexts not set. This should only happen when testing');
+		tracelogger.error(
+			'nonEmptyContexts not set. This should only happen when testing'
+		);
 
 		pointer.nonEmptyContexts = pointer.getContexts().filter((c, i) => {
 			//Always keep the primary.  It should never be empty, but just in case
 			if (i === 0) {
 				if (isEmpty(c.contextText.trim())) {
-					logger.error('Found a primary context with empty contextText.  Where did that come from?', pointer);
+					logger.error(
+						'Found a primary context with empty contextText.  Where did that come from?',
+						pointer
+					);
 				}
 				return true;
 			}
@@ -1256,8 +1502,7 @@ export function getCurrentNodeMatches (pointer, treeWalker) {
 	return matches;
 }
 
-
-export function containsFullContext (pointer) {
+export function containsFullContext(pointer) {
 	//Do we have a primary + 5 additional?
 
 	if (!pointer.getContexts()) {
@@ -1269,7 +1514,8 @@ export function containsFullContext (pointer) {
 	}
 
 	//Maybe we have 5 characters of additional context
-	let i, chars = 0;
+	let i,
+		chars = 0;
 
 	for (i = 1; i < pointer.getContexts().length; i++) {
 		chars += pointer.getContexts()[i].contextText.length;
@@ -1278,9 +1524,8 @@ export function containsFullContext (pointer) {
 	return chars >= 15;
 }
 
-
 /* tested */
-export function referenceNodeForNode (node, allowsUnsafeAnchors) {
+export function referenceNodeForNode(node, allowsUnsafeAnchors) {
 	if (!node) {
 		return null;
 	}
@@ -1291,9 +1536,8 @@ export function referenceNodeForNode (node, allowsUnsafeAnchors) {
 	return referenceNodeForNode(node.parentNode, allowsUnsafeAnchors);
 }
 
-
 /* tested */
-export function makeRangeAnchorable (range, docElement) {
+export function makeRangeAnchorable(range, docElement) {
 	if (!range) {
 		throw new Error('Range cannot be null');
 	}
@@ -1305,16 +1549,21 @@ export function makeRangeAnchorable (range, docElement) {
 		endOffset = range.endOffset;
 
 	//If both anchors are already anchorable, we are done here.
-	if (endEdgeNode === range.endContainer &&
+	if (
+		endEdgeNode === range.endContainer &&
 		startEdgeNode === range.startContainer &&
 		isNodeAnchorable(startEdgeNode) &&
-		isNodeAnchorable(endEdgeNode)) {
+		isNodeAnchorable(endEdgeNode)
+	) {
 		return range;
 	}
 
 	//Clean up either end by looking for anchorable nodes inward or outward:
 	if (!isNodeAnchorable(startEdgeNode)) {
-		startEdgeNode = searchFromRangeStartInwardForAnchorableNode(startEdgeNode, range.commonAncestorContainer);
+		startEdgeNode = searchFromRangeStartInwardForAnchorableNode(
+			startEdgeNode,
+			range.commonAncestorContainer
+		);
 		startOffset = 0;
 	}
 	if (!isNodeAnchorable(endEdgeNode)) {
@@ -1341,15 +1590,13 @@ export function makeRangeAnchorable (range, docElement) {
 		//start:
 		if (DOM.isTextNode(startEdgeNode)) {
 			newRange.setStart(startEdgeNode, startOffset);
-		}
-		else {
+		} else {
 			newRange.setStartBefore(startEdgeNode);
 		}
 		//end:
 		if (DOM.isTextNode(endEdgeNode)) {
 			newRange.setEnd(endEdgeNode, endOffset);
-		}
-		else {
+		} else {
 			newRange.setEndAfter(endEdgeNode);
 		}
 	}
@@ -1357,17 +1604,24 @@ export function makeRangeAnchorable (range, docElement) {
 	return newRange;
 }
 
-
 //TODO for these two methods consider skipping over any nodes with 'data-no-anchorable-children'
 //as an optimization. (Probably minor since those are small parts of the tree right now)
 //TODO provide an end we don't go past
 /* exported for tests */
-export function searchFromRangeStartInwardForAnchorableNode (startNode, commonParent) {
+export function searchFromRangeStartInwardForAnchorableNode(
+	startNode,
+	commonParent
+) {
 	if (!startNode) {
 		return null;
 	}
 
-	let walker = document.createTreeWalker(commonParent, NodeFilter.SHOW_ALL, null, null);
+	let walker = document.createTreeWalker(
+		commonParent,
+		NodeFilter.SHOW_ALL,
+		null,
+		null
+	);
 
 	walker.currentNode = startNode;
 
@@ -1384,10 +1638,9 @@ export function searchFromRangeStartInwardForAnchorableNode (startNode, commonPa
 	return null;
 }
 
-
 /* tested */
 //TODO provide a node we don't go past
-export function searchFromRangeEndInwardForAnchorableNode (endNode) {
+export function searchFromRangeEndInwardForAnchorableNode(endNode) {
 	//handle simple cases where we can immediatly return
 	if (!endNode) {
 		return null;
@@ -1398,7 +1651,7 @@ export function searchFromRangeEndInwardForAnchorableNode (endNode) {
 
 	endNode = walkDownToLastNode(endNode);
 
-	function recurse (n) {
+	function recurse(n) {
 		if (!n) {
 			return null;
 		}
@@ -1423,9 +1676,8 @@ export function searchFromRangeEndInwardForAnchorableNode (endNode) {
 	return recurse(endNode);
 }
 
-
 /* tested */
-export function walkDownToLastNode (node) {
+export function walkDownToLastNode(node) {
 	if (!node) {
 		throw new Error('Node cannot be null');
 	}
@@ -1443,16 +1695,14 @@ export function walkDownToLastNode (node) {
 	return result;
 }
 
-
 /* tested */
-export function nodeThatIsEdgeOfRange (range, start) {
+export function nodeThatIsEdgeOfRange(range, start) {
 	if (!range) {
 		throw new Error('Node is not defined');
 	}
 
 	let container = start ? range.startContainer : range.endContainer;
 	let offset = start ? range.startOffset : range.endOffset;
-
 
 	//If the container is a textNode look no further, that node is the edge
 	if (DOM.isTextNode(container)) {
@@ -1479,7 +1729,11 @@ export function nodeThatIsEdgeOfRange (range, start) {
 		if (container.previousSibling) {
 			return container.previousSibling;
 		}
-		while (!container.previousSibling && container.parentNode && offset !== 0) {
+		while (
+			!container.previousSibling &&
+			container.parentNode &&
+			offset !== 0
+		) {
 			container = container.parentNode;
 		}
 
@@ -1492,19 +1746,21 @@ export function nodeThatIsEdgeOfRange (range, start) {
 	return container.childNodes.item(offset - 1);
 }
 
-
 /* tested */
-export function isNodeAnchorable (theNode, unsafeAnchorsAllowed) {
+export function isNodeAnchorable(theNode, unsafeAnchorsAllowed) {
 	//obviously not if node is not there
 	if (!theNode) {
 		return false;
 	}
 
-	function isNodeItselfAnchorable (node, allowUnsafeAnchors) {
+	function isNodeItselfAnchorable(node, allowUnsafeAnchors) {
 		//distill the possible ids into an id var for easier reference later
-		let id = node.id || (node.getAttribute ? node.getAttribute('id') : null),
+		let id =
+				node.id || (node.getAttribute ? node.getAttribute('id') : null),
 			ntiid = node.getAttribute ? node.getAttribute('data-ntiid') : null,
-			nonAnchorable = node.getAttribute ? node.getAttribute('data-non-anchorable') : false;
+			nonAnchorable = node.getAttribute
+				? node.getAttribute('data-non-anchorable')
+				: false;
 
 		if (nonAnchorable) {
 			return false;
@@ -1551,14 +1807,16 @@ export function isNodeAnchorable (theNode, unsafeAnchorsAllowed) {
 	//If the itself is anchorable make sure its not in a parent
 	//that claims nothing is anchorable
 	if (isNodeItselfAnchorable(theNode, unsafeAnchorsAllowed)) {
-		return !DOM.parent(theNode, '[' + NO_ANCHORABLE_CHILDREN_ATTRIBUTE + ']');
+		return !DOM.parent(
+			theNode,
+			'[' + NO_ANCHORABLE_CHILDREN_ATTRIBUTE + ']'
+		);
 	}
 	return false;
 }
 
-
 /* tested */
-export function purifyRange (range, doc) {
+export function purifyRange(range, doc) {
 	let docFrag,
 		tempRange = createRange(doc),
 		origStartNode = range.startContainer,
@@ -1577,7 +1835,10 @@ export function purifyRange (range, doc) {
 		newEndOffset;
 
 	//make sure the common ancestor is anchorable, otherwise we have a problem, climb to one that is
-	while (ancestor && (!isNodeAnchorable(ancestor) || DOM.isTextNode(ancestor))) {
+	while (
+		ancestor &&
+		(!isNodeAnchorable(ancestor) || DOM.isTextNode(ancestor))
+	) {
 		ancestor = ancestor.parentNode;
 	}
 	if (!ancestor) {
@@ -1600,7 +1861,13 @@ export function purifyRange (range, doc) {
 
 	const START_TAG_LENGTH = 33;
 	tagNode(origStartEdgeNode, 'start', origStartModifiedOff);
-	tagNode(origEndEdgeNode, 'end', (origStartEdgeNode === origEndEdgeNode) ? origEndModifiedOff + START_TAG_LENGTH : origEndModifiedOff);
+	tagNode(
+		origEndEdgeNode,
+		'end',
+		origStartEdgeNode === origEndEdgeNode
+			? origEndModifiedOff + START_TAG_LENGTH
+			: origEndModifiedOff
+	);
 
 	//setup our copy range
 	tempRange.selectNode(ancestor);
@@ -1627,20 +1894,17 @@ export function purifyRange (range, doc) {
 	resultRange = createRange(doc);
 	if (!startEdge && !DOM.isTextNode(endEdge)) {
 		resultRange.selectNodeContents(endEdge);
-	}
-	else {
+	} else {
 		resultRange.selectNodeContents(docFrag);
 		if (DOM.isTextNode(startEdge)) {
 			resultRange.setStart(startEdge, newStartOffset);
-		}
-		else {
+		} else {
 			resultRange.setStartBefore(startEdge);
 		}
 
 		if (DOM.isTextNode(endEdge)) {
 			resultRange.setEnd(endEdge, newEndOffset);
-		}
-		else {
+		} else {
 			resultRange.setEndAfter(endEdge);
 		}
 	}
@@ -1650,64 +1914,66 @@ export function purifyRange (range, doc) {
 	return resultRange;
 }
 
-
-export function purifyNode (docFrag) {
+export function purifyNode(docFrag) {
 	if (!docFrag) {
 		throw new Error('must pass a node to purify.');
 	}
 
 	//remove any action or counter spans and their children:
-	let remove = ['span.application-highlight.counter', 'span.redactionAction', 'span.blockRedactionAction'];
+	let remove = [
+		'span.application-highlight.counter',
+		'span.redactionAction',
+		'span.blockRedactionAction',
+	];
 
-	for(let trash of remove) {
-		for(let el of docFrag.querySelectorAll(trash)) {
+	for (let trash of remove) {
+		for (let el of docFrag.querySelectorAll(trash)) {
 			DOM.removeNode(el);
 		}
 	}
 
 	//loop over elements we need to remove and, well, remove them:
-	for(let n of docFrag.querySelectorAll('[data-non-anchorable]')) {
+	for (let n of docFrag.querySelectorAll('[data-non-anchorable]')) {
 		if (n.parentNode) {
 			let parentContainer = n.parentNode;
 			let nodeToInsertBefore = n;
-			for(let c of Array.from(n.childNodes)) {
+			for (let c of Array.from(n.childNodes)) {
 				parentContainer.insertBefore(c, nodeToInsertBefore);
 			}
 
 			//remove non-anchorable node
 			parentContainer.removeChild(nodeToInsertBefore);
+		} else {
+			throw new Error(
+				'Non-Anchorable node has no previous siblings or parent nodes.'
+			);
 		}
-		else {
-			throw new Error('Non-Anchorable node has no previous siblings or parent nodes.');
-		}
-
 	}
 
 	docFrag.normalize();
 	return docFrag;
 }
 
-
 /* tested */
-export function tagNode (node, tag, textOffset) {
+export function tagNode(node, tag, textOffset) {
 	let attr = PURIFICATION_TAG,
-		start, end;
+		start,
+		end;
 
 	if (DOM.isTextNode(node)) {
 		start = node.textContent.substring(0, textOffset);
 		end = node.textContent.substring(textOffset);
 		node.textContent = start + '[' + attr + ':' + tag + ']' + end;
-	}
-	else {
+	} else {
 		node.setAttribute(attr + '-' + tag, 'true');
 	}
 }
 
-
 /* tested */
-export function cleanNode (node, tag) {
+export function cleanNode(node, tag) {
 	let attr = PURIFICATION_TAG,
-		tagSelector, offset;
+		tagSelector,
+		offset;
 
 	//generic protection:
 	if (!node) {
@@ -1720,17 +1986,20 @@ export function cleanNode (node, tag) {
 		if (offset >= 0) {
 			node.textContent = node.textContent.replace(tagSelector, '');
 		}
-	}
-	else {
+	} else {
 		node.removeAttribute(attr + '-' + tag);
 	}
 	return offset;
 }
 
-
 /* tested */
-export function findTaggedNode (root, tag) {
-	let walker = document.createTreeWalker(root, NodeFilter.SHOW_ALL, null, null),
+export function findTaggedNode(root, tag) {
+	let walker = document.createTreeWalker(
+			root,
+			NodeFilter.SHOW_ALL,
+			null,
+			null
+		),
 		attr = PURIFICATION_TAG,
 		selector = '[' + attr + ':' + tag + ']',
 		temp = root;
@@ -1740,15 +2009,12 @@ export function findTaggedNode (root, tag) {
 			if (temp.textContent.indexOf(selector) >= 0) {
 				return temp; //found it
 			}
-		}
-		else if (temp.getAttribute) {
+		} else if (temp.getAttribute) {
 			let a = temp.getAttribute(attr + '-' + tag);
 			if (a) {
 				return temp;
 			}
-
-		}
-		else if (!temp || temp.nodeType !== 11) {
+		} else if (!temp || temp.nodeType !== 11) {
 			logger.warn('skipping node while looking for tag', temp);
 		}
 
@@ -1759,9 +2025,8 @@ export function findTaggedNode (root, tag) {
 	return null;
 }
 
-
 //TODO - testing
-function toReferenceNodeXpathAndOffset (result) {
+function toReferenceNodeXpathAndOffset(result) {
 	//get a reference node that is NOT a text node...
 	let referenceNode = referenceNodeForNode(result.node, true);
 	while (referenceNode && DOM.isTextNode(referenceNode)) {
@@ -1772,10 +2037,13 @@ function toReferenceNodeXpathAndOffset (result) {
 	}
 
 	//TODO - must be a Node, not txt?
-	let referencePointer = new ElementDomContentPointer(null, null, {node: referenceNode, role: 'ancestor'});
+	let referencePointer = new ElementDomContentPointer(null, null, {
+		node: referenceNode,
+		role: 'ancestor',
+	});
 	let adaptedResult = {
 		referencePointer,
-		offset: result.offset
+		offset: result.offset,
 	};
 
 	if (result.node !== referenceNode) {
@@ -1793,9 +2061,8 @@ function toReferenceNodeXpathAndOffset (result) {
 	return adaptedResult;
 }
 
-
 //TODO - testing
-function indexInParentsChildren (node) {
+function indexInParentsChildren(node) {
 	let i = 0;
 	while ((node = node.previousSibling) !== null) {
 		i++;
@@ -1803,14 +2070,22 @@ function indexInParentsChildren (node) {
 	return i;
 }
 
-
-function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElement) {
+function convertStaticResultToLiveDomContainerAndOffset(
+	staticResult,
+	docElement
+) {
 	if (!staticResult) {
 		return null;
 	}
 
-	let body = docElement.body || findElementsWithTagName(docElement, 'body')[0] || docElement;
-	let referenceNode = locateRangePointInAncestor(staticResult.referencePointer, body).node;
+	let body =
+		docElement.body ||
+		findElementsWithTagName(docElement, 'body')[0] ||
+		docElement;
+	let referenceNode = locateRangePointInAncestor(
+		staticResult.referencePointer,
+		body
+	).node;
 
 	if (!referenceNode) {
 		return null;
@@ -1819,7 +2094,7 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 	referenceNode.normalize();
 
 	if (!staticResult.xpath) {
-		return {container: referenceNode};
+		return { container: referenceNode };
 	}
 
 	let container = referenceNode;
@@ -1827,7 +2102,6 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 	let result;
 
 	while (parts.length > 1) {
-
 		if (DOM.isTextNode(container)) {
 			logger.error('Expected a non text node.  Expect errors', container);
 		}
@@ -1836,7 +2110,10 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 		let part = parseInt(parts.pop(), 10);
 
 		if (part >= kids.length) {
-			logger.error('Invalid xpath ' + staticResult.xpath + ' from node', referenceNode);
+			logger.error(
+				'Invalid xpath ' + staticResult.xpath + ' from node',
+				referenceNode
+			);
 			return null;
 		}
 
@@ -1845,14 +2122,17 @@ function convertStaticResultToLiveDomContainerAndOffset (staticResult, docElemen
 	}
 
 	let lastPart = parseInt(parts.pop(), 10);
-	result = ithChildAccountingForSyntheticNodes(container, lastPart, staticResult.offset);
+	result = ithChildAccountingForSyntheticNodes(
+		container,
+		lastPart,
+		staticResult.offset
+	);
 
 	return result;
 }
 
-
 //TODO - testing
-function ithChildAccountingForSyntheticNodes (node, idx, offset) {
+function ithChildAccountingForSyntheticNodes(node, idx, offset) {
 	if (idx < 0 || !node.firstChild) {
 		return null;
 	}
@@ -1882,7 +2162,10 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 		//If child is a textNode we want to advance to the last
 		//nextnode adjacent to it.
 		if (DOM.isTextNode(child)) {
-			while (i < childrenWithSyntheticsRemoved.length - 1 && DOM.isTextNode(childrenWithSyntheticsRemoved[i + 1])) {
+			while (
+				i < childrenWithSyntheticsRemoved.length - 1 &&
+				DOM.isTextNode(childrenWithSyntheticsRemoved[i + 1])
+			) {
 				i++;
 			}
 		}
@@ -1900,7 +2183,13 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 	if (offset !== null) {
 		//If the container isn't a text node, the offset is the ith child
 		if (!DOM.isTextNode(child)) {
-			result = {container: ithChildAccountingForSyntheticNodes(child, offset, null)};
+			result = {
+				container: ithChildAccountingForSyntheticNodes(
+					child,
+					offset,
+					null
+				),
+			};
 			//logger.log('Returning result from child is not textnode branch', result);
 			return result;
 		}
@@ -1914,7 +2203,7 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 			//Note <= range can be at the very end (equal to length)
 			limit = textNode.textContent.length;
 			if (offset <= limit) {
-				result = {container: textNode, offset: offset};
+				result = { container: textNode, offset: offset };
 				return result;
 			}
 
@@ -1922,24 +2211,22 @@ function ithChildAccountingForSyntheticNodes (node, idx, offset) {
 			i++;
 		}
 
-
 		tracelogger.error('Can`t find offset in joined textNodes');
 
 		return null;
-
 	}
 
-	return {container: child};
+	return { container: child };
 }
-
 
 //TODO -testing
 //TODO - this can probably somehow be replaced with a purifiedNode call, rather than the logic that skips text nodes and subtracts offsets etc.
-function childrenIfSyntheticsRemoved (node) {
-
-	if (DOM.matches(node, 'span.application-highlight.counter') ||
+function childrenIfSyntheticsRemoved(node) {
+	if (
+		DOM.matches(node, 'span.application-highlight.counter') ||
 		DOM.matches(node, 'span.redactionAction') ||
-		DOM.matches(node, 'span.blockRedactionAction')) {
+		DOM.matches(node, 'span.blockRedactionAction')
+	) {
 		//ignore children:
 		//logger.log('ignoring children of', node, 'when finding non synthetic kids');
 		return [];
@@ -1947,33 +2234,34 @@ function childrenIfSyntheticsRemoved (node) {
 
 	let sanitizedChildren = [];
 	for (let child of Array.from(node.childNodes)) {
-
 		if (child.getAttribute && child.getAttribute('data-non-anchorable')) {
-			sanitizedChildren = sanitizedChildren.concat(childrenIfSyntheticsRemoved(child));
-		}
-		else {
+			sanitizedChildren = sanitizedChildren.concat(
+				childrenIfSyntheticsRemoved(child)
+			);
+		} else {
 			sanitizedChildren.push(child);
 		}
 	}
 	return sanitizedChildren;
 }
 
-
 /* tested */
-export function cleanRangeFromBadStartAndEndContainers (range) {
-	function isBlankTextNode (n) {
-		return (DOM.isTextNode(n) && n.textContent.trim().length === 0);
+export function cleanRangeFromBadStartAndEndContainers(range) {
+	function isBlankTextNode(n) {
+		return DOM.isTextNode(n) && n.textContent.trim().length === 0;
 	}
 
 	let startContainer = range.startContainer,
 		endContainer = range.endContainer,
-		ancestor = DOM.isTextNode(range.commonAncestorContainer) ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer,
+		ancestor = DOM.isTextNode(range.commonAncestorContainer)
+			? range.commonAncestorContainer.parentNode
+			: range.commonAncestorContainer,
 		txtNodes = DOM.getTextNodes(ancestor);
 
-
 	if (isBlankTextNode(startContainer)) {
-
-		tracelogger.log('found a range with a starting node that is nothing but whitespace');
+		tracelogger.log(
+			'found a range with a starting node that is nothing but whitespace'
+		);
 
 		let index = txtNodes.indexOf(startContainer);
 		for (let i = index; i < txtNodes.length; i++) {
@@ -1985,8 +2273,9 @@ export function cleanRangeFromBadStartAndEndContainers (range) {
 	}
 
 	if (isBlankTextNode(endContainer)) {
-
-		tracelogger.log('found a range with a end node that is nothing but whitespace');
+		tracelogger.log(
+			'found a range with a end node that is nothing but whitespace'
+		);
 
 		let index = txtNodes.indexOf(endContainer);
 		for (let i = index; i >= 0; i--) {
@@ -1999,8 +2288,7 @@ export function cleanRangeFromBadStartAndEndContainers (range) {
 	return range;
 }
 
-
-export function isMathChild (node) {
+export function isMathChild(node) {
 	if (!node) {
 		return false;
 	}
@@ -2012,22 +2300,17 @@ export function isMathChild (node) {
 	return !!DOM.parent(node, '.math');
 }
 
-
-function getImmutableBlockParent (node) {
+function getImmutableBlockParent(node) {
 	let query = x => DOM.parent(node, `.page-contents *:not(${x}) > ${x}`);
 
-	let immutables = ['.math', '[data-reactid]']
-		.map(query)
-		.filter(x => x);
-
+	let immutables = ['.math', '[data-reactid]'].map(query).filter(x => x);
 
 	return immutables.length <= 1
 		? immutables[0]
-		: immutables.reduce((a, b) => a.contains(b) ? a : b);
+		: immutables.reduce((a, b) => (a.contains(b) ? a : b));
 }
 
-
-export function expandRangeToIncludeImmutableBlocks (range) {
+export function expandRangeToIncludeImmutableBlocks(range) {
 	if (!range) {
 		return null;
 	}
@@ -2044,8 +2327,7 @@ export function expandRangeToIncludeImmutableBlocks (range) {
 	}
 }
 
-
-export function expandSelectionToIncludeImmutableBlocks (sel) {
+export function expandSelectionToIncludeImmutableBlocks(sel) {
 	let range = sel.getRangeAt(0);
 	if (range) {
 		sel.removeAllRanges();

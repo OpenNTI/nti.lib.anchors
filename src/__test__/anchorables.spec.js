@@ -1,26 +1,50 @@
 /* eslint-env jest */
-import {isTextNode} from '@nti/lib-dom';
-import {getModel} from '@nti/lib-interfaces';
+import { isTextNode } from '@nti/lib-dom';
+import { getModel } from '@nti/lib-interfaces';
 
 const wait = x => new Promise(t => setTimeout(t, x));
 
-const RealDomContentRangeDescription = getModel('contentrange.domcontentrangedescription');
+const RealDomContentRangeDescription = getModel(
+	'contentrange.domcontentrangedescription'
+);
 
 const RealDomContentPointer = getModel('contentrange.domcontentpointer');
-const RealElementDomContentPointer = getModel('contentrange.elementdomcontentpointer');
-const RealTextDomContentPointer = getModel('contentrange.textdomcontentpointer');
+const RealElementDomContentPointer = getModel(
+	'contentrange.elementdomcontentpointer'
+);
+const RealTextDomContentPointer = getModel(
+	'contentrange.textdomcontentpointer'
+);
 
 const RealTextContext = getModel('contentrange.textcontext');
 
-
 const isEmpty = x => x == null || x.length === 0;
 
-
-class DomContentPointer extends RealDomContentPointer { constructor (o) { super(null, null, o); } }
-class ElementDomContentPointer extends RealElementDomContentPointer { constructor (o) { super(null, null, o); } }
-class TextDomContentPointer extends RealTextDomContentPointer { constructor (o) { super(null, null, o); } }
-class DomContentRangeDescription extends RealDomContentRangeDescription { constructor (o) { super(null, null, o); } }
-class TextContext extends RealTextContext { constructor (o) { super(null, null, o); } }
+class DomContentPointer extends RealDomContentPointer {
+	constructor(o) {
+		super(null, null, o);
+	}
+}
+class ElementDomContentPointer extends RealElementDomContentPointer {
+	constructor(o) {
+		super(null, null, o);
+	}
+}
+class TextDomContentPointer extends RealTextDomContentPointer {
+	constructor(o) {
+		super(null, null, o);
+	}
+}
+class DomContentRangeDescription extends RealDomContentRangeDescription {
+	constructor(o) {
+		super(null, null, o);
+	}
+}
+class TextContext extends RealTextContext {
+	constructor(o) {
+		super(null, null, o);
+	}
+}
 
 import {
 	PURIFICATION_TAG,
@@ -53,17 +77,14 @@ import {
 	searchFromRangeStartInwardForAnchorableNode,
 	tagNode,
 	toDomRange,
-	walkDownToLastNode
-
+	walkDownToLastNode,
 } from '../index';
 
-
-function addClass (element, cls) {
+function addClass(element, cls) {
 	element.classList.add(cls);
 }
 
 describe('Anchors', () => {
-
 	let testBody;
 
 	beforeEach(() => {
@@ -77,7 +98,9 @@ describe('Anchors', () => {
 
 	describe('rootContainerIdFromDocument Tests', () => {
 		beforeEach(() => {
-			for(let h of Array.from(document.querySelectorAll('head > meta'))) {
+			for (let h of Array.from(
+				document.querySelectorAll('head > meta')
+			)) {
 				h.remove();
 			}
 		});
@@ -143,9 +166,7 @@ describe('Anchors', () => {
 	});
 
 	describe('createRangeDescriptionFromRange Tests', () => {
-
-
-		it('Create Description with non-anchorable', (done) => {
+		it('Create Description with non-anchorable', done => {
 			const id = 'ThisIdIsTheBestest';
 			const div = document.createElement('div');
 
@@ -164,7 +185,7 @@ describe('Anchors', () => {
 			testBody.appendChild(div);
 			document.body.appendChild(testBody);
 
-			function validate () {
+			function validate() {
 				const a = document.querySelector('.a');
 				const b = document.querySelector('.b');
 				expect(a).toBeTruthy();
@@ -178,7 +199,10 @@ describe('Anchors', () => {
 				expect(range.startOffset).toBe(1);
 				expect(range.endOffset).toBe(6);
 
-				const {description: result} = createRangeDescriptionFromRange(range, document);
+				const { description: result } = createRangeDescriptionFromRange(
+					range,
+					document
+				);
 
 				expect(result).toBeTruthy();
 
@@ -186,7 +210,7 @@ describe('Anchors', () => {
 				done();
 			}
 
-			function check () {
+			function check() {
 				if (!document.querySelector(`#${id} .b`)) {
 					return setTimeout(check, 100);
 				}
@@ -231,7 +255,8 @@ describe('Anchors', () => {
 		it('Create Desciption from range of image with id', () => {
 			let img = document.createElement('img'),
 				span = document.createElement('span'),
-				range, result;
+				range,
+				result;
 
 			//set up img with data:
 			span.setAttribute('id', 'sdfasdfsdfasd');
@@ -290,7 +315,6 @@ describe('Anchors', () => {
 			expect(isNodeAnchorable(node)).toBeFalsy();
 		});
 
-
 		it('node with data-ntiid attr', () => {
 			let node = document.createElement('div');
 			node.setAttribute('data-ntiid', 'something-great');
@@ -322,8 +346,7 @@ describe('Anchors', () => {
 			try {
 				nodeThatIsEdgeOfRange(null, true);
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Node is not defined');
 			}
 		});
@@ -338,8 +361,12 @@ describe('Anchors', () => {
 			range.setStart(txtNode1, 5);
 			range.setEnd(txtNode2, 5);
 
-			expect(nodeThatIsEdgeOfRange(range, true).textContent).toEqual(txtNode1.textContent);
-			expect(nodeThatIsEdgeOfRange(range, false).textContent).toEqual(txtNode2.textContent);
+			expect(nodeThatIsEdgeOfRange(range, true).textContent).toEqual(
+				txtNode1.textContent
+			);
+			expect(nodeThatIsEdgeOfRange(range, false).textContent).toEqual(
+				txtNode2.textContent
+			);
 		});
 
 		it('Range Without Children, start', () => {
@@ -548,7 +575,6 @@ describe('Anchors', () => {
 			expect(nodeThatIsEdgeOfRange(range, false).tagName).toEqual('SPAN');
 		});
 
-
 		it('Range of Mixed Nodes', () => {
 			let range = document.createRange(),
 				div = document.createElement('div'),
@@ -565,7 +591,6 @@ describe('Anchors', () => {
 			expect(isTextNode(nodeThatIsEdgeOfRange(range, true))).toBeTruthy();
 			expect(nodeThatIsEdgeOfRange(range, true)).toBe(t);
 		});
-
 
 		it('Range of Non Text Nodes, negative offset', () => {
 			let range = document.createRange(),
@@ -586,18 +611,27 @@ describe('Anchors', () => {
 			range.setStart(txtNode2, 5);
 			range.setEnd(nonTxtNode2, 0);
 
-			expect(nodeThatIsEdgeOfRange(range, false).getAttribute('test')).toEqual('test');
+			expect(
+				nodeThatIsEdgeOfRange(range, false).getAttribute('test')
+			).toEqual('test');
 		});
 	});
 
 	describe('searchFromRangeStartInwardForAnchorableNode Tests', () => {
 		it('Null Node', () => {
-			expect(searchFromRangeStartInwardForAnchorableNode(null)).toBeNull();
+			expect(
+				searchFromRangeStartInwardForAnchorableNode(null)
+			).toBeNull();
 		});
 
 		it('Already Anchorable Node', () => {
-			let anchorable = document.createTextNode('This is a text node, yay'),
-				result = searchFromRangeStartInwardForAnchorableNode(anchorable, anchorable);
+			let anchorable = document.createTextNode(
+					'This is a text node, yay'
+				),
+				result = searchFromRangeStartInwardForAnchorableNode(
+					anchorable,
+					anchorable
+				);
 
 			expect(result).toBe(anchorable);
 		});
@@ -668,8 +702,10 @@ describe('Anchors', () => {
 			div.appendChild(p2);
 			testBody.appendChild(div);
 
-
-			anchorableNode = searchFromRangeStartInwardForAnchorableNode(replacementText, div);
+			anchorableNode = searchFromRangeStartInwardForAnchorableNode(
+				replacementText,
+				div
+			);
 			expect(anchorableNode).toBe(t2);
 		});
 
@@ -702,7 +738,9 @@ describe('Anchors', () => {
 			let div = document.createElement('div'),
 				a = document.createElement('a'),
 				s = document.createElement('span'),
-				t = document.createTextNode(' What is the product of the digits of 7! ? '),
+				t = document.createTextNode(
+					' What is the product of the digits of 7! ? '
+				),
 				// empty = document.createTextNode(' '),
 				result;
 
@@ -719,7 +757,6 @@ describe('Anchors', () => {
 			expect(result).toBeTruthy();
 			expect(result).toBe(t);
 		});
-
 	});
 
 	describe('walkDownToLastNode Tests', () => {
@@ -727,8 +764,7 @@ describe('Anchors', () => {
 			try {
 				walkDownToLastNode(null);
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Node cannot be null');
 			}
 		});
@@ -799,7 +835,7 @@ describe('Anchors', () => {
 			expect(isNodeChildOfAncestor(d4, d2)).toBe(true);
 			expect(isNodeChildOfAncestor(d4, d1)).toBe(true);
 		});
-		it('Siblings and cousins don\'t match', () => {
+		it("Siblings and cousins don't match", () => {
 			let d1 = document.createElement('div');
 			let d2 = document.createElement('div');
 			let d3 = document.createElement('div');
@@ -810,7 +846,7 @@ describe('Anchors', () => {
 			expect(isNodeChildOfAncestor(d3, d2)).toBe(false);
 			expect(isNodeChildOfAncestor(d4, d2)).toBe(false);
 		});
-		it('Backwards relationships don\'t match', () => {
+		it("Backwards relationships don't match", () => {
 			let d1 = document.createElement('div');
 			let d2 = document.createElement('div');
 			let d3 = document.createElement('div');
@@ -828,7 +864,9 @@ describe('Anchors', () => {
 		});
 
 		it('Already Anchorable Node', () => {
-			let anchorable = document.createTextNode('This is a text node, yay'),
+			let anchorable = document.createTextNode(
+					'This is a text node, yay'
+				),
 				result = searchFromRangeEndInwardForAnchorableNode(anchorable);
 
 			expect(result).toBe(anchorable);
@@ -907,8 +945,10 @@ describe('Anchors', () => {
 			div.appendChild(p1);
 			testBody.appendChild(div);
 
-
-			anchorableNode = searchFromRangeEndInwardForAnchorableNode(replacementText, div);
+			anchorableNode = searchFromRangeEndInwardForAnchorableNode(
+				replacementText,
+				div
+			);
 			expect(anchorableNode).toBe(t2);
 		});
 	});
@@ -918,7 +958,8 @@ describe('Anchors', () => {
 			let div = document.createElement('div'),
 				t1 = document.createTextNode('test node 1'),
 				t2 = document.createTextNode('test node 2'),
-				range, result;
+				range,
+				result;
 
 			//make sure div is valid
 			div.setAttribute('id', 'someid');
@@ -945,7 +986,8 @@ describe('Anchors', () => {
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('text node 2'),
 				a = document.createElement('div'),
-				range, result;
+				range,
+				result;
 
 			p2.appendChild(t2);
 			span2.appendChild(p2);
@@ -976,7 +1018,8 @@ describe('Anchors', () => {
 				replacementText = document.createTextNode('***'),
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('See spot run'),
-				range, anchorableRange;
+				range,
+				anchorableRange;
 
 			div.setAttribute('id', 'sdfgkljsdflkjslkcms');
 
@@ -1006,8 +1049,7 @@ describe('Anchors', () => {
 			try {
 				makeRangeAnchorable(null, null);
 				expect(false).toBeTruthy();
-			}
-			catch (e) {
+			} catch (e) {
 				expect(e.message).toEqual('Range cannot be null');
 			}
 		});
@@ -1019,7 +1061,8 @@ describe('Anchors', () => {
 				span2 = document.createElement('span'),
 				p2 = document.createElement('p'),
 				a = document.createElement('a'),
-				range, result;
+				range,
+				result;
 
 			span2.appendChild(p2);
 			span.appendChild(p);
@@ -1042,7 +1085,9 @@ describe('Anchors', () => {
 		});
 
 		it('Node Already Anchorable', () => {
-			let textNode = document.createTextNode('Scott Pilgram vs. The World');
+			let textNode = document.createTextNode(
+				'Scott Pilgram vs. The World'
+			);
 			expect(referenceNodeForNode(textNode)).toBe(textNode);
 		});
 
@@ -1064,20 +1109,22 @@ describe('Anchors', () => {
 			try {
 				locateElementDomContentPointer(null, null, false);
 				expect(false).toBeTruthy();
-			}
-			catch (e) {
-				expect(e.message).toEqual('This method expects ElementDomContentPointers only');
+			} catch (e) {
+				expect(e.message).toEqual(
+					'This method expects ElementDomContentPointers only'
+				);
 			}
 		});
 
 		it('Wrong Node Type', () => {
-			let domContentPointer = new DomContentPointer({role: 'start'});
+			let domContentPointer = new DomContentPointer({ role: 'start' });
 			try {
 				locateElementDomContentPointer(domContentPointer, null, null);
 				this.fail('Not supposed to happen');
-			}
-			catch(e) {
-				expect(e.message).toEqual('This method expects ElementDomContentPointers only');
+			} catch (e) {
+				expect(e.message).toEqual(
+					'This method expects ElementDomContentPointers only'
+				);
 			}
 		});
 
@@ -1090,7 +1137,11 @@ describe('Anchors', () => {
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('text node 2'),
 				a = document.createElement('div'),
-				pointer = new ElementDomContentPointer({role: 'start', elementTagName: 'p', elementId: 'SomeId'}),
+				pointer = new ElementDomContentPointer({
+					role: 'start',
+					elementTagName: 'p',
+					elementId: 'SomeId',
+				}),
 				result = {};
 
 			p2.appendChild(t2);
@@ -1117,7 +1168,11 @@ describe('Anchors', () => {
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('text node 2'),
 				a = document.createElement('div'),
-				pointer = new ElementDomContentPointer({role: 'end', elementTagName: 'p', elementId: 'SomeId2'}),
+				pointer = new ElementDomContentPointer({
+					role: 'end',
+					elementTagName: 'p',
+					elementId: 'SomeId2',
+				}),
 				result = {};
 
 			p.setAttribute('id', 'SomeId1');
@@ -1131,7 +1186,9 @@ describe('Anchors', () => {
 			p2.setAttribute('id', 'SomeId2');
 			testBody.appendChild(div);
 
-			result = locateElementDomContentPointer(pointer, div, {node: span2});
+			result = locateElementDomContentPointer(pointer, div, {
+				node: span2,
+			});
 			expect(result.confidence).toEqual(1);
 			expect(result.node).toBe(p2);
 		});
@@ -1145,9 +1202,12 @@ describe('Anchors', () => {
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('text node 2'),
 				a = document.createElement('div'),
-				pointer = new ElementDomContentPointer({role: 'start', elementTagName: 'p', elementId: 'SomeId'}),
+				pointer = new ElementDomContentPointer({
+					role: 'start',
+					elementTagName: 'p',
+					elementId: 'SomeId',
+				}),
 				result = {};
-
 
 			p2.appendChild(t2);
 			span2.appendChild(p2);
@@ -1158,7 +1218,9 @@ describe('Anchors', () => {
 			div.appendChild(span);
 			testBody.appendChild(div);
 
-			result = locateElementDomContentPointer(pointer, div, {node: span2});
+			result = locateElementDomContentPointer(pointer, div, {
+				node: span2,
+			});
 			expect(result.confidence).toEqual(0);
 			expect(result.node).toBeFalsy();
 		});
@@ -1175,7 +1237,10 @@ describe('Anchors', () => {
 			div.appendChild(p);
 			testBody.appendChild(div);
 
-			let pointer = new ElementDomContentPointer({node: p, role: 'start'});
+			let pointer = new ElementDomContentPointer({
+				node: p,
+				role: 'start',
+			});
 
 			result = locateElementDomContentPointer(pointer, p, {});
 			expect(result.confidence).toEqual(1);
@@ -1188,8 +1253,7 @@ describe('Anchors', () => {
 			try {
 				resolveSpecBeneathAncestor(null, null, document);
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Must supply Description');
 			}
 		});
@@ -1198,8 +1262,7 @@ describe('Anchors', () => {
 			try {
 				resolveSpecBeneathAncestor(true, true, null);
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Must supply a docElement');
 			}
 		});
@@ -1214,18 +1277,18 @@ describe('Anchors', () => {
 					start: new ElementDomContentPointer({
 						role: 'start',
 						elementTagName: 'div',
-						elementId: 'Id1'
+						elementId: 'Id1',
 					}),
 					end: new ElementDomContentPointer({
 						role: 'end',
 						elementTagName: 'div',
-						elementId: 'Id2'
+						elementId: 'Id2',
 					}),
 					ancestor: new ElementDomContentPointer({
 						role: 'ancestor',
 						elementTagName: 'SPAN',
-						elementId: 'Span1'
-					})
+						elementId: 'Span1',
+					}),
 				}),
 				result;
 
@@ -1259,14 +1322,14 @@ describe('Anchors', () => {
 						ancestor: new ElementDomContentPointer({
 							role: 'ancestor',
 							elementTagName: 'div',
-							elementId: 'DivId1'
+							elementId: 'DivId1',
 						}),
 						contexts: [
 							new TextContext({
 								contextText: 'Node Number',
-								contextOffset: 13
-							})
-						]
+								contextOffset: 13,
+							}),
+						],
 					}),
 					end: new TextDomContentPointer({
 						role: 'end',
@@ -1274,20 +1337,20 @@ describe('Anchors', () => {
 						ancestor: new ElementDomContentPointer({
 							role: 'ancestor',
 							elementTagName: 'DIv', //just pass in weird caps, should not matter
-							elementId: 'DivId2'
+							elementId: 'DivId2',
 						}),
 						contexts: [
 							new TextContext({
 								contextText: 'Test Number',
-								contextOffset: 5
-							})
-						]
+								contextOffset: 5,
+							}),
+						],
 					}),
 					ancestor: new ElementDomContentPointer({
 						role: 'ancestor',
 						elementTagName: 'SPAN',
-						elementId: 'SpanId1'
-					})
+						elementId: 'SpanId1',
+					}),
 				}),
 				result;
 
@@ -1314,18 +1377,18 @@ describe('Anchors', () => {
 					start: new ElementDomContentPointer({
 						role: 'start',
 						elementTagName: 'div',
-						elementId: 'Id1xxx'
+						elementId: 'Id1xxx',
 					}),
 					end: new ElementDomContentPointer({
 						role: 'end',
 						elementTagName: 'div',
-						elementId: 'Id2xxx'
+						elementId: 'Id2xxx',
 					}),
 					ancestor: new ElementDomContentPointer({
 						role: 'ancestor',
 						elementTagName: 'SPAN',
-						elementId: 'Span1xxx'
-					})
+						elementId: 'Span1xxx',
+					}),
 				}),
 				result;
 
@@ -1340,8 +1403,7 @@ describe('Anchors', () => {
 			try {
 				locateRangeEdgeForAnchor(null, null);
 				expect(false).toBeTruthy();
-			}
-			catch (e) {
+			} catch (e) {
 				expect(e.message).toEqual('Must supply a Pointer');
 			}
 		});
@@ -1350,16 +1412,17 @@ describe('Anchors', () => {
 			let pointer = new ElementDomContentPointer({
 				role: 'start',
 				elementTagName: 'div',
-				elementId: '12345'
+				elementId: '12345',
 			});
 
 			//send in doc.body for maximum workage
 			try {
 				locateRangeEdgeForAnchor(pointer, document.body);
 				expect(false).toBeTruthy();
-			}
-			catch (e) {
-				expect(e.message).toEqual('ContentPointer must be a TextDomContentPointer');
+			} catch (e) {
+				expect(e.message).toEqual(
+					'ContentPointer must be a TextDomContentPointer'
+				);
 			}
 		});
 
@@ -1370,14 +1433,14 @@ describe('Anchors', () => {
 					ancestor: new ElementDomContentPointer({
 						role: 'ancestor',
 						elementTagName: 'div',
-						elementId: 'GobbleDeGook!!!'
+						elementId: 'GobbleDeGook!!!',
 					}),
 					contexts: [
 						new TextContext({
 							contextText: 'Unfindable Text, Boogie Boo!!!',
-							contextOffset: 19
-						})
-					]
+							contextOffset: 19,
+						}),
+					],
 				}),
 				result;
 
@@ -1404,16 +1467,14 @@ describe('Anchors', () => {
 			try {
 				lastWordFromString(null);
 				expect(false).toBeTruthy();
-			}
-			catch (e) {
+			} catch (e) {
 				expect(e.message).toEqual('Must supply a string');
 			}
 
 			try {
 				firstWordFromString(null);
 				expect(false).toBeTruthy();
-			}
-			catch (e) {
+			} catch (e) {
 				expect(e.message).toEqual('Must supply a string');
 			}
 		});
@@ -1421,7 +1482,7 @@ describe('Anchors', () => {
 
 	describe('containsFullContext tests', () => {
 		it('containsFullContext works fine', () => {
-			function makeContexts (array) {
+			function makeContexts(array) {
 				let contexts = [];
 				for (let i = 0; i < array.length; i++) {
 					contexts.push({ contextText: array[i] });
@@ -1431,7 +1492,9 @@ describe('Anchors', () => {
 				return output;
 			}
 			let tests = [];
-			tests.push(makeContexts(['front back', 'bob', 'ag', 'e', 'hippo', 'red']));
+			tests.push(
+				makeContexts(['front back', 'bob', 'ag', 'e', 'hippo', 'red'])
+			);
 			tests.push(makeContexts(['front back', 'really', 'long', 'words']));
 			tests.push(makeContexts(['front back', 'should', 'fail']));
 			tests.push(makeContexts(['front back', 'f', 'a', 'i', 'l']));
@@ -1450,8 +1513,7 @@ describe('Anchors', () => {
 			try {
 				generatePrimaryContext(null);
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Range must not be null');
 			}
 		});
@@ -1463,7 +1525,8 @@ describe('Anchors', () => {
 				span2 = document.createElement('span'),
 				p2 = document.createElement('p'),
 				a = document.createElement('a'),
-				range, result;
+				range,
+				result;
 
 			span2.appendChild(p2);
 			span.appendChild(p);
@@ -1488,7 +1551,8 @@ describe('Anchors', () => {
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('Also, this is more text'),
 				a = document.createElement('a'),
-				range, result;
+				range,
+				result;
 
 			p.appendChild(t);
 			p2.appendChild(t2);
@@ -1513,14 +1577,18 @@ describe('Anchors', () => {
 			try {
 				generateAdditionalContext(null, 'start');
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Node must not be null');
 			}
 		});
 
 		it('Non-Text Node', () => {
-			expect(generateAdditionalContext(document.createElement('div'), 'start')).toBeNull();
+			expect(
+				generateAdditionalContext(
+					document.createElement('div'),
+					'start'
+				)
+			).toBeNull();
 		});
 
 		it('Text Node', () => {
@@ -1540,8 +1608,7 @@ describe('Anchors', () => {
 			try {
 				createTextPointerFromRange(null, 'start');
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Cannot proceed without range');
 			}
 		});
@@ -1568,24 +1635,26 @@ describe('Anchors', () => {
 			try {
 				createTextPointerFromRange(range);
 				expect(false).toBeTruthy();
-			}
-			catch(e) {
+			} catch (e) {
 				expect(e.message).toEqual('Must supply an Id');
 			}
-
-
 		});
 
 		it('Good Range', () => {
 			let div = document.createElement('div'),
 				span = document.createElement('span'),
 				p = document.createElement('p'),
-				t1 = document.createTextNode('Once upon a time, there lived a BEAST!'),
+				t1 = document.createTextNode(
+					'Once upon a time, there lived a BEAST!'
+				),
 				span2 = document.createElement('span'),
 				p2 = document.createElement('p'),
-				t2 = document.createTextNode('The beasts name was, NextThoughtASaurus!'),
+				t2 = document.createTextNode(
+					'The beasts name was, NextThoughtASaurus!'
+				),
 				a = document.createElement('a'),
-				range, result;
+				range,
+				result;
 
 			p.setAttribute('id', 'xzy1232314');
 			p.appendChild(t1);
@@ -1601,11 +1670,12 @@ describe('Anchors', () => {
 			range.setStart(t1, 3);
 			range.setEnd(t2, 5);
 
-
 			result = createTextPointerFromRange(range, 'end');
 			expect(result).toBeTruthy();
 			expect(result.getRole()).toEqual('end');
-			expect(result.getAncestor().getElementId()).toEqual(p2.getAttribute('id'));
+			expect(result.getAncestor().getElementId()).toEqual(
+				p2.getAttribute('id')
+			);
 			expect(result.getContexts().length).toBeGreaterThan(0);
 		});
 
@@ -1613,15 +1683,19 @@ describe('Anchors', () => {
 			let div = document.createElement('div'),
 				span = document.createElement('span'),
 				p = document.createElement('p'),
-				t1 = document.createTextNode('Once upon a time, there lived a BEAST!'),
+				t1 = document.createTextNode(
+					'Once upon a time, there lived a BEAST!'
+				),
 				span2 = document.createElement('span'),
 				p2 = document.createElement('p'),
-				t2 = document.createTextNode('The beasts name was, NextThoughtASaurus!'),
+				t2 = document.createTextNode(
+					'The beasts name was, NextThoughtASaurus!'
+				),
 				t3 = document.createTextNode(' '),
 				em = document.createElement('em'),
-
 				a = document.createElement('a'),
-				range, result;
+				range,
+				result;
 
 			p.setAttribute('id', 'xzy1232314');
 			p.appendChild(t1);
@@ -1639,11 +1713,12 @@ describe('Anchors', () => {
 			range.setStart(t1, 3);
 			range.setEnd(t2, 5);
 
-
 			result = createTextPointerFromRange(range, 'end');
 			expect(result).toBeTruthy();
 			expect(result.getRole()).toEqual('end');
-			expect(result.getAncestor().getElementId()).toEqual(p2.getAttribute('id'));
+			expect(result.getAncestor().getElementId()).toEqual(
+				p2.getAttribute('id')
+			);
 			expect(result.getContexts().length).toBeGreaterThan(0);
 
 			let anyEmpty = false;
@@ -1661,14 +1736,21 @@ describe('Anchors', () => {
 	describe('Range Putrification Tests', () => {
 		it('Purify Range Test', () => {
 			let p = document.createElement('p'),
-				t1 = document.createTextNode('this is a text node, yay!	 go us!'),
-				t2 = document.createTextNode('this is also a text node, yay!  go us!'),
+				t1 = document.createTextNode(
+					'this is a text node, yay!	 go us!'
+				),
+				t2 = document.createTextNode(
+					'this is also a text node, yay!  go us!'
+				),
 				spanNoAnchors = document.createElement('span'),
 				em = document.createElement('em'),
-				t3 = document.createTextNode('This is more text actually, always more text'),
+				t3 = document.createTextNode(
+					'This is more text actually, always more text'
+				),
 				span = document.createElement('span'),
 				t4 = document.createTextNode('This is the final text'),
-				pureRange, range;
+				pureRange,
+				range;
 
 			//add some stuff to span, clone it, add some more, see if it worked
 			p.appendChild(t1);
@@ -1695,23 +1777,38 @@ describe('Anchors', () => {
 			p.setAttribute('shouldNOTBeThere', 'true'); //this should not be in the pureRange
 
 			//do some checking of attrs to verify they are clones and not the same refs:
-			expect(pureRange.commonAncestorContainer.getAttribute('shouldBeThere')).toBeTruthy();
-			expect(pureRange.commonAncestorContainer.getAttribute('shouldNOTBeThere')).not.toBeTruthy();
+			expect(
+				pureRange.commonAncestorContainer.getAttribute('shouldBeThere')
+			).toBeTruthy();
+			expect(
+				pureRange.commonAncestorContainer.getAttribute(
+					'shouldNOTBeThere'
+				)
+			).not.toBeTruthy();
 			expect(range.toString()).toEqual(pureRange.toString()); //expect the range to encompass the same text
-			expect(range.commonAncestorContainer.parentNode).toBe(pureRange.ownerNode);
+			expect(range.commonAncestorContainer.parentNode).toBe(
+				pureRange.ownerNode
+			);
 		});
 
 		it('Purify Range Where Ancestor is non-anchorable', () => {
 			let div = document.createElement('div'),
 				p = document.createElement('p'),
-				t1 = document.createTextNode('this is a text node, yay!	 go us!'),
-				t2 = document.createTextNode('this is also a text node, yay!  go us!'),
+				t1 = document.createTextNode(
+					'this is a text node, yay!	 go us!'
+				),
+				t2 = document.createTextNode(
+					'this is also a text node, yay!  go us!'
+				),
 				spanNoAnchors = document.createElement('span'),
 				em = document.createElement('em'),
-				t3 = document.createTextNode('This is more text actually, always more text'),
+				t3 = document.createTextNode(
+					'This is more text actually, always more text'
+				),
 				span = document.createElement('span'),
 				t4 = document.createTextNode('This is the final text'),
-				pureRange, range;
+				pureRange,
+				range;
 
 			//add some stuff to span, clone it, add some more, see if it worked
 			p.setAttribute('data-non-anchorable', 'true');
@@ -1742,14 +1839,21 @@ describe('Anchors', () => {
 		it('Purify Range Where Endpoints are elements', () => {
 			let div = document.createElement('div'),
 				p = document.createElement('p'),
-				t1 = document.createTextNode('this is a text node, yay!	 go us!'),
-				t2 = document.createTextNode('this is also a text node, yay!  go us!'),
+				t1 = document.createTextNode(
+					'this is a text node, yay!	 go us!'
+				),
+				t2 = document.createTextNode(
+					'this is also a text node, yay!  go us!'
+				),
 				spanNoAnchors = document.createElement('span'),
 				em = document.createElement('em'),
-				t3 = document.createTextNode('This is more text actually, always more text'),
+				t3 = document.createTextNode(
+					'This is more text actually, always more text'
+				),
 				span = document.createElement('span'),
 				t4 = document.createTextNode('This is the final text'),
-				pureRange, range;
+				pureRange,
+				range;
 
 			//add some stuff to span, clone it, add some more, see if it worked
 			p.setAttribute('data-non-anchorable', 'true');
@@ -1780,7 +1884,9 @@ describe('Anchors', () => {
 		it('Tagging and Cleaning Test', () => {
 			let nodeWithNoAttr = document.createElement('span'),
 				nodeWithAttr = document.createElement('span'),
-				textNodeWithNoTag = document.createTextNode('this is some text'),
+				textNodeWithNoTag = document.createTextNode(
+					'this is some text'
+				),
 				textNodeWithTag = document.createTextNode('this is also text');
 
 			//add stuff to nodes where needed:
@@ -1788,8 +1894,12 @@ describe('Anchors', () => {
 			tagNode(textNodeWithTag, 'tagged-baby!');
 
 			//check that things were tagged well:
-			expect(nodeWithAttr.getAttribute(PURIFICATION_TAG + '-tagged')).toBeTruthy();
-			expect(textNodeWithTag.textContent.indexOf(PURIFICATION_TAG)).toBeGreaterThan(-1);
+			expect(
+				nodeWithAttr.getAttribute(PURIFICATION_TAG + '-tagged')
+			).toBeTruthy();
+			expect(
+				textNodeWithTag.textContent.indexOf(PURIFICATION_TAG)
+			).toBeGreaterThan(-1);
 
 			//cleanup and check results
 			cleanNode(nodeWithNoAttr, 'x');
@@ -1797,15 +1907,25 @@ describe('Anchors', () => {
 			cleanNode(textNodeWithNoTag, 'x');
 
 			cleanNode(textNodeWithTag, 'tagged-baby!');
-			expect(nodeWithNoAttr.getAttribute(PURIFICATION_TAG + '-x')).toBeNull();
-			expect(nodeWithAttr.getAttribute(PURIFICATION_TAG + '-tagged')).toBeNull();
-			expect(textNodeWithNoTag.textContent.indexOf(PURIFICATION_TAG)).toEqual(-1);
-			expect(textNodeWithTag.textContent.indexOf(PURIFICATION_TAG)).toEqual(-1);
+			expect(
+				nodeWithNoAttr.getAttribute(PURIFICATION_TAG + '-x')
+			).toBeNull();
+			expect(
+				nodeWithAttr.getAttribute(PURIFICATION_TAG + '-tagged')
+			).toBeNull();
+			expect(
+				textNodeWithNoTag.textContent.indexOf(PURIFICATION_TAG)
+			).toEqual(-1);
+			expect(
+				textNodeWithTag.textContent.indexOf(PURIFICATION_TAG)
+			).toEqual(-1);
 		});
 
 		it('Cleaning Text Node with Multiple Tags', () => {
-			let text = 'You know [data-nti-purification-tag:start]how to add, subtract, multiply[data-nti-purification-tag:end], and divide. In fact, you may already know how to solve many of the problems in this chapter. So why do we start this book with an entire chapter on arithmetic?',
-				expected = 'You know how to add, subtract, multiply, and divide. In fact, you may already know how to solve many of the problems in this chapter. So why do we start this book with an entire chapter on arithmetic?',
+			let text =
+					'You know [data-nti-purification-tag:start]how to add, subtract, multiply[data-nti-purification-tag:end], and divide. In fact, you may already know how to solve many of the problems in this chapter. So why do we start this book with an entire chapter on arithmetic?',
+				expected =
+					'You know how to add, subtract, multiply, and divide. In fact, you may already know how to solve many of the problems in this chapter. So why do we start this book with an entire chapter on arithmetic?',
 				textNode = document.createTextNode(text);
 
 			cleanNode(textNode, 'end');
@@ -1822,7 +1942,6 @@ describe('Anchors', () => {
 				t1 = document.createTextNode('once upon a time'),
 				t2 = document.createTextNode(' there lived 3 bears'),
 				textWithMultTags = document.createTextNode('some fancy text');
-
 
 			//apply tags in some spots:
 			tagNode(s1, 'tag1');
@@ -1843,15 +1962,21 @@ describe('Anchors', () => {
 			expect(findTaggedNode(p1, 'tag2')).toBe(t1);
 			expect(findTaggedNode(p1, 'tag3')).toBe(s2);
 			expect(findTaggedNode(p1, 'tag4')).toBe(t2);
-			expect(findTaggedNode(textWithMultTags, 'multi-tag1')).toBe(textWithMultTags);
-			expect(findTaggedNode(textWithMultTags, 'multi-tag2')).toBe(textWithMultTags);
-
+			expect(findTaggedNode(textWithMultTags, 'multi-tag1')).toBe(
+				textWithMultTags
+			);
+			expect(findTaggedNode(textWithMultTags, 'multi-tag2')).toBe(
+				textWithMultTags
+			);
 		});
 
 		it('Purification Offset With Singular Text Node', () => {
 			let p = document.createElement('p'),
-				textNode = document.createTextNode('This is a single text node that exists inside a paragraph!	Can you believe that?'),
-				pureRange, range;
+				textNode = document.createTextNode(
+					'This is a single text node that exists inside a paragraph!	Can you believe that?'
+				),
+				pureRange,
+				range;
 
 			//add some stuff to span, clone it, add some more, see if it worked
 			p.appendChild(textNode);
@@ -1868,7 +1993,9 @@ describe('Anchors', () => {
 
 			//do some checking of attrs to verify they are clones and not the same refs:
 			expect(range.toString()).toEqual(pureRange.toString()); //expect the range to encompass the same text
-			expect(range.commonAncestorContainer.parentNode).toBe(pureRange.ownerNode);
+			expect(range.commonAncestorContainer.parentNode).toBe(
+				pureRange.ownerNode
+			);
 		});
 	});
 
@@ -1901,10 +2028,15 @@ describe('Anchors', () => {
 			range.setStart(s1, 0);
 			range.setEnd(t, 27);
 
-			expect(cleanRangeFromBadStartAndEndContainers(range, true).startContainer).toEqual(t);
-			expect(cleanRangeFromBadStartAndEndContainers(range, false).endContainer).toEqual(t);
+			expect(
+				cleanRangeFromBadStartAndEndContainers(range, true)
+					.startContainer
+			).toEqual(t);
+			expect(
+				cleanRangeFromBadStartAndEndContainers(range, false)
+					.endContainer
+			).toEqual(t);
 		});
-
 	});
 
 	describe('isMathChild Tests', () => {
@@ -2087,14 +2219,17 @@ describe('Anchors', () => {
 			expect(range.startOffset).toBe(1);
 			expect(range.endContainer).toBe(div);
 			expect(range.endOffset).toBe(4);
-
 		});
 	});
 
 	describe('expandSelectionBy Tests', () => {
 		it('Test It', () => {
-			let pretext = document.createTextNode('This is some text that belongs before my div'),
-				posttext = document.createTextNode('This is some text that belongs after my div'),
+			let pretext = document.createTextNode(
+					'This is some text that belongs before my div'
+				),
+				posttext = document.createTextNode(
+					'This is some text that belongs after my div'
+				),
 				div = document.createElement('div'),
 				span1 = document.createElement('span'),
 				text1 = document.createTextNode('Text 1'),
@@ -2134,7 +2269,6 @@ describe('Anchors', () => {
 			//TODO - check expansion code in Main.js
 			// expandSelectionBy(sel, 50, true);
 
-
 			// expect(sel.toString().indexOf('is some text that belongs before my div')).toBe(0);
 			// expect(sel.toString().indexOf('This is some text that belongs after my div')).toBe(80);
 		});
@@ -2167,16 +2301,31 @@ describe('Anchors', () => {
 			root.appendChild(p2);
 			testBody.appendChild(root);
 
-			recreatedRange = toDomRange(emptyDesc.description, document, document.body.parentNode, null, 'foo');
+			recreatedRange = toDomRange(
+				emptyDesc.description,
+				document,
+				document.body.parentNode,
+				null,
+				'foo'
+			);
 			expect(recreatedRange).toBeTruthy();
-			expect(recreatedRange.commonAncestorContainer).toBe(document.body.parentNode);
+			expect(recreatedRange.commonAncestorContainer).toBe(
+				document.body.parentNode
+			);
 
 			root.setAttribute('id', '123242354543523');
-			recreatedRange = toDomRange(emptyDesc.description, document, document.body.parentNode, '123242354543523', 'pagecontainer');
+			recreatedRange = toDomRange(
+				emptyDesc.description,
+				document,
+				document.body.parentNode,
+				'123242354543523',
+				'pagecontainer'
+			);
 			expect(recreatedRange).toBeTruthy();
-			expect(recreatedRange.commonAncestorContainer).toBe(root.parentNode);
+			expect(recreatedRange.commonAncestorContainer).toBe(
+				root.parentNode
+			);
 		});
-
 	});
 
 	describe('Integration Tests', () => {
@@ -2187,7 +2336,9 @@ describe('Anchors', () => {
 				t1 = document.createTextNode('This is some text.'), //same as t2
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('This is some text.'),
-				range, desc, recreatedRange;
+				range,
+				desc,
+				recreatedRange;
 
 			//set up ids and heirarchy
 			root.setAttribute('id', '123242354543523');
@@ -2215,14 +2366,18 @@ describe('Anchors', () => {
 			desc = createRangeDescriptionFromRange(range, document).description;
 			expect(desc).toBeTruthy();
 			expect(desc.getAncestor()).toBeTruthy();
-			expect(desc.getAncestor().getElementId()).toEqual(root.getAttribute('id'));
+			expect(desc.getAncestor().getElementId()).toEqual(
+				root.getAttribute('id')
+			);
 
 			//now round trip back to a range, verify that it is the same range as before
 			recreatedRange = toDomRange(desc, document, document.body);
 			expect(recreatedRange).toBeTruthy();
 			expect(recreatedRange.startContainer).toBe(range.startContainer);
 			expect(recreatedRange.endContainer).toBe(range.endContainer);
-			expect(recreatedRange.commonAncestorContainer).toBe(range.commonAncestorContainer);
+			expect(recreatedRange.commonAncestorContainer).toBe(
+				range.commonAncestorContainer
+			);
 		});
 
 		it('Ancestor Spanning Identical Text Node Bug with data-ntiids', () => {
@@ -2231,10 +2386,15 @@ describe('Anchors', () => {
 				t1 = document.createTextNode('This is some text.'), //same as t2
 				p2 = document.createElement('p'),
 				t2 = document.createTextNode('This is some text.'),
-				range, desc, recreatedRange;
+				range,
+				desc,
+				recreatedRange;
 
 			//set up ids and heirarchy
-			root.setAttribute('data-ntiid', 'tag:nextthought.com,2011-123242354543523'); //Note this needs to look like an ntiid
+			root.setAttribute(
+				'data-ntiid',
+				'tag:nextthought.com,2011-123242354543523'
+			); //Note this needs to look like an ntiid
 			p1.setAttribute('position', 1);
 			p1.appendChild(t1);
 			p2.setAttribute('position', 2);
@@ -2259,16 +2419,19 @@ describe('Anchors', () => {
 			desc = createRangeDescriptionFromRange(range, document).description;
 			expect(desc).toBeTruthy();
 			expect(desc.getAncestor()).toBeTruthy();
-			expect(desc.getAncestor().getElementId()).toEqual(root.getAttribute('data-ntiid'));
+			expect(desc.getAncestor().getElementId()).toEqual(
+				root.getAttribute('data-ntiid')
+			);
 
 			//now round trip back to a range, verify that it is the same range as before
 			recreatedRange = toDomRange(desc, document, document.body);
 			expect(recreatedRange).toBeTruthy();
 			expect(recreatedRange.startContainer).toBe(range.startContainer);
 			expect(recreatedRange.endContainer).toBe(range.endContainer);
-			expect(recreatedRange.commonAncestorContainer).toBe(range.commonAncestorContainer);
+			expect(recreatedRange.commonAncestorContainer).toBe(
+				range.commonAncestorContainer
+			);
 		});
-
 
 		it('Ambigious Model Causing Incorrect Highlight Bug', () => {
 			/*
@@ -2292,8 +2455,11 @@ describe('Anchors', () => {
 				em3 = document.createElement('em'),
 				t6 = document.createTextNode('foo'),
 				t7 = document.createTextNode('. '),
-				range, desc, recreatedRange,
-				expectedRangeToString = 'This is a sentenceWOW. Another sentenceYIKES and foo. ';
+				range,
+				desc,
+				recreatedRange,
+				expectedRangeToString =
+					'This is a sentenceWOW. Another sentenceYIKES and foo. ';
 
 			//setup ids and heirarchies:
 			p.setAttribute('id', 'id');
@@ -2331,14 +2497,18 @@ describe('Anchors', () => {
 			desc = createRangeDescriptionFromRange(range, document).description;
 			expect(desc).toBeTruthy();
 			expect(desc.getAncestor()).toBeTruthy();
-			expect(desc.getAncestor().getElementId()).toEqual(p.getAttribute('id'));
+			expect(desc.getAncestor().getElementId()).toEqual(
+				p.getAttribute('id')
+			);
 
 			//now round trip back to a range, verify that it is the same range as before
 			recreatedRange = toDomRange(desc, document, document.body);
 			expect(recreatedRange).toBeTruthy();
 			expect(recreatedRange.startContainer).toBe(range.startContainer);
 			expect(recreatedRange.endContainer).toBe(range.endContainer);
-			expect(recreatedRange.commonAncestorContainer).toBe(range.commonAncestorContainer);
+			expect(recreatedRange.commonAncestorContainer).toBe(
+				range.commonAncestorContainer
+			);
 			expect(recreatedRange.toString()).toEqual(expectedRangeToString);
 		});
 
@@ -2350,7 +2520,6 @@ describe('Anchors', () => {
 			</li>
 			 */
 
-
 			let li = document.createElement('li'),
 				a = document.createElement('a'),
 				s1 = document.createTextNode(' '),
@@ -2359,7 +2528,9 @@ describe('Anchors', () => {
 				p = document.createElement('p'),
 				t = document.createTextNode('an increase from 100 to 130 '),
 				div = document.createElement('div'),
-				range, desc, recreatedRange;
+				range,
+				desc,
+				recreatedRange;
 
 			//set up ids and heirarchy
 			div.setAttribute('id', 'nti-content');
@@ -2390,13 +2561,17 @@ describe('Anchors', () => {
 			expect(recreatedRange).toBeTruthy();
 			expect(recreatedRange.startContainer).toBe(range.startContainer);
 			expect(recreatedRange.endContainer).toBe(range.endContainer);
-			expect(recreatedRange.commonAncestorContainer).toBe(range.commonAncestorContainer);
+			expect(recreatedRange.commonAncestorContainer).toBe(
+				range.commonAncestorContainer
+			);
 		});
 	});
 
 	describe('scopeContainerId', () => {
 		beforeEach(() => {
-			for(let h of Array.from(document.querySelectorAll('head > meta'))) {
+			for (let h of Array.from(
+				document.querySelectorAll('head > meta')
+			)) {
 				h.remove();
 			}
 		});
@@ -2406,8 +2581,12 @@ describe('Anchors', () => {
 				pageContent = document.createElement('div'),
 				footNotesContent = document.createElement('div'),
 				footnotes = document.createElement('ol'),
-				rootId, head, meta, searchWithin,
-				containerId = 'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.4';
+				rootId,
+				head,
+				meta,
+				searchWithin,
+				containerId =
+					'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.4';
 
 			//Setup the page ntiid meta tag.
 			expect(rootContainerIdFromDocument(document)).toBeFalsy();
@@ -2422,7 +2601,6 @@ describe('Anchors', () => {
 			expect(rootId).toBeTruthy();
 			expect(rootId).toEqual(containerId);
 
-
 			//Build the page content
 			mainNode.setAttribute('id', 'nti-content');
 			pageContent.setAttribute('data-ntiid', containerId);
@@ -2435,17 +2613,20 @@ describe('Anchors', () => {
 			testBody.appendChild(mainNode);
 
 			//Check the scope container.
-			searchWithin = scopedContainerNode( testBody, containerId, rootId);
+			searchWithin = scopedContainerNode(testBody, containerId, rootId);
 			expect(searchWithin).not.toBe(pageContent);
 			expect(searchWithin).toBe(testBody);
-
 		});
 
 		it('searches within the fragment node when the containerId is not provided', () => {
 			let mainNode = document.createElement('div'),
 				pageContent = document.createElement('div'),
-				rootId, searchWithin, head, meta,
-				containerId = 'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.4';
+				rootId,
+				searchWithin,
+				head,
+				meta,
+				containerId =
+					'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.4';
 
 			//Setup the page ntiid meta tag.
 			expect(rootContainerIdFromDocument(document)).toBeFalsy();
@@ -2468,7 +2649,7 @@ describe('Anchors', () => {
 			testBody.appendChild(mainNode);
 
 			//Check the scope container.
-			searchWithin = scopedContainerNode( pageContent, null, rootId);
+			searchWithin = scopedContainerNode(pageContent, null, rootId);
 			expect(searchWithin).not.toBe(testBody);
 			expect(searchWithin).toBe(pageContent);
 		});
@@ -2476,8 +2657,10 @@ describe('Anchors', () => {
 		it('looks for the containerNode when the containerId and rootId are different', () => {
 			let mainNode = document.createElement('div'),
 				pageContent = document.createElement('div'),
-				containerId = 'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.3',
-				rootId, searchWithin;
+				containerId =
+					'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.3',
+				rootId,
+				searchWithin;
 
 			//Check to see if the rootId is equal to the containerId
 			rootId = rootContainerIdFromDocument(document);
@@ -2485,14 +2668,21 @@ describe('Anchors', () => {
 			//Build the page content
 			mainNode.setAttribute('id', 'nti-content');
 			pageContent.setAttribute('id', 'a0000000050');
-			pageContent.setAttribute('data-ntiid', 'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.3');
+			pageContent.setAttribute(
+				'data-ntiid',
+				'tag:nextthought.com,2011-10:Columbia-HTML-Great_Leader_Essays.biography.3'
+			);
 
 			mainNode.appendChild(pageContent);
 			testBody.appendChild(mainNode);
 
 			//Check the scope container.
 			// TODO: test not done. can't the searchWithin let is null, needs to do better setup.
-			searchWithin = scopedContainerNode( pageContent, containerId, rootId);
+			searchWithin = scopedContainerNode(
+				pageContent,
+				containerId,
+				rootId
+			);
 			expect(searchWithin).not.toBe(testBody);
 			expect(searchWithin).not.toBe(pageContent);
 			expect(searchWithin).toBeNull();
@@ -2504,12 +2694,22 @@ describe('Anchors', () => {
 			let div = document.createElement('div'),
 				childDiv = document.createElement('div'),
 				anotherDiv = document.createElement('div'),
-
-				ancestor = new ElementDomContentPointer({role: 'ancestor', elementTagName: 'div', elementId: 'parent'}),
-				start = new ElementDomContentPointer({role: 'start', elementTagName: 'div', elementId: 'child'}),
-				end = new ElementDomContentPointer({role: 'end', elementTagName: 'div', elementId: 'child'}),
-
-				desc = new DomContentRangeDescription({start, end, ancestor});
+				ancestor = new ElementDomContentPointer({
+					role: 'ancestor',
+					elementTagName: 'div',
+					elementId: 'parent',
+				}),
+				start = new ElementDomContentPointer({
+					role: 'start',
+					elementTagName: 'div',
+					elementId: 'child',
+				}),
+				end = new ElementDomContentPointer({
+					role: 'end',
+					elementTagName: 'div',
+					elementId: 'child',
+				}),
+				desc = new DomContentRangeDescription({ start, end, ancestor });
 
 			anotherDiv.setAttribute('id', 'thisIsNotTheDivYouSeek');
 			div.setAttribute('id', 'parent');
