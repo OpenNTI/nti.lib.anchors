@@ -5,9 +5,6 @@
   "license": "UNLICENSED",
   "description": "Content Anchor handling library",
   "main": "src/index.js",
-  "files": [
-    "src"
-  ],
   "scripts": {
     "test": "lib-scripts test",
     "start": "lib-scripts test --watch",
