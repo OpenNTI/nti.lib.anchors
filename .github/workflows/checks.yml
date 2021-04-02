@@ -10,8 +10,10 @@ on:
         branches:
             - master
             - 'maint-*'
-        tags:
-            - 'v[0-9]+*'
+        paths:
+            - 'src/**.jsx?'
+            - 'src/**.mjs'
+            - 'src/**.cjs'
 
     pull_request:
         branches:
